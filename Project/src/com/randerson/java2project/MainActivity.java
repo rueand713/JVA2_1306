@@ -8,16 +8,22 @@ import android.view.Menu;
 
 public class MainActivity extends Activity {
 
+	// create a new InterfaceManager object
+	InterfaceManager UIFactory;
+			
+	// instantiate a new intent
+	Intent detailsView;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
 		// create a new InterfaceManager object
-		InterfaceManager UIFactory = new InterfaceManager(this);
+		UIFactory = new InterfaceManager(this);
 		
 		// instantiate a new intent
-		Intent detailsView = UIFactory.makeIntent(MainActivity.class);
+		detailsView = UIFactory.makeIntent(DetailActivity.class);
 		
 	}
 
