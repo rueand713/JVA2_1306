@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    style="@style/AppBaseTheme"
+    >
+        
+        <TextView android:id="@+id/conditionheader" 
+            	android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/current"
+                android:textAlignment="center"
+                android:paddingBottom="10dip"
+                style="@style/Titles"
+        />
+        
+        <GridLayout android:id="@+id/gridconditions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="2">
+            
+            <TextView android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/condition"
+                style="@style/WeatherTitles"
+                />
+            
+            <TextView android:id="@+id/currentcondition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/blank"
+                style="@style/WeatherInfo"
+                />
+            
+            <TextView android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/temp"
+                style="@style/WeatherTitles"
+                />
+            
+            <TextView android:id="@+id/tempcondition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/blank"
+                style="@style/WeatherInfo"
+                />
+            
+            <TextView android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/humidity"
+                style="@style/WeatherTitles"
+                />
+            
+            <TextView android:id="@+id/humiditycondition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/blank"
+                style="@style/WeatherInfo"
+                />
+            
+            <TextView android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/winspd"
+                style="@style/WeatherTitles"
+                />
+            
+            <TextView android:id="@+id/winspdcondition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/blank"
+                style="@style/WeatherInfo"
+                />
+            
+           <TextView android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/windir"
+                style="@style/WeatherTitles"
+                />
+            
+            <TextView android:id="@+id/windircondition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/blank"
+                style="@style/WeatherInfo"
+                />
+            
+        </GridLayout>
+    
+</LinearLayout>
