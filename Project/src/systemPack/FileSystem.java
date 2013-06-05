@@ -1,3 +1,13 @@
+/*
+ * project 		Java2Project
+ * 
+ * package 		systemPack
+ * 
+ * @author 		Rueben Anderson
+ * 
+ * date			Jun 5, 2013
+ * 
+ */
 package systemPack;
 
 import java.io.BufferedInputStream;
