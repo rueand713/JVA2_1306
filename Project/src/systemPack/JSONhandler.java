@@ -17,10 +17,9 @@ public class JSONhandler {
 		try {
 			// set the JsonValue string by querying through the json object
 			jsonValue = json.getJSONObject("data").getJSONArray("current_condition").getJSONObject(0).getString(key);
-			
-			Log.i("JSON", jsonValue);
+	
 		} catch (JSONException e) {
-			Log.e("ERROR", "JSON Exception error");
+			Log.e("ERROR", "JSON Exception error within 'readJSONObject()'");
 		}
 		
 		return jsonValue;
@@ -37,7 +36,7 @@ public class JSONhandler {
 			thisJSON = new JSONObject(JSONString);
 			
 		} catch (JSONException e) {
-			Log.e("ERROR", "JSON Exception Error");
+			Log.e("ERROR", "JSON Exception error within 'returnJSONObject()'");
 		}
 		
 		// return the object

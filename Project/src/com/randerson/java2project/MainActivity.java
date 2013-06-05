@@ -81,13 +81,9 @@ public class MainActivity extends Activity {
 					// retrieve the selected button text value from the instance
 					String selectedValue = rBtn.getText().toString();
 				
-					// check to make sure there was an active network
-					if (connected == true)
-					{
-						detailsView.putExtra("selected", selectedValue);
+					detailsView.putExtra("selected", selectedValue);
 						
-						startActivity(detailsView);
-					}
+					startActivity(detailsView);
 				}
 			}
 		});

@@ -20,5 +20,9 @@
     <string name="logo">App Logo</string>
     <string name="blank"> </string>
     <string name="current">Current Weather</string>
+    <string name="day_field">Day </string>
+    <string name="temp_field"> Temp </string>
+    <string name="humidity_field"> Humidity </string>
+    <string name="condition_field"> Condition</string>
     
 </resources>
