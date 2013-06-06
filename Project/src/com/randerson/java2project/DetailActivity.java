@@ -21,17 +21,27 @@ import org.json.JSONObject;
 
 import systemPack.FileSystem;
 import systemPack.IOManager;
+import systemPack.InterfaceManager;
 import systemPack.JSONhandler;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.os.AsyncTask;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Messenger;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.TextView;
 
 
+@SuppressLint("HandlerLeak")
 public class DetailActivity extends Activity {
+	
+	// token identifiers for the service class
+	public static final String MESSENGER_KEY = "Messenger";
+	public static final String URL_KEY = "Url";
 	
 	// setup the views for weather detail layout
 	TextView currentCondition;
@@ -84,6 +94,9 @@ public class DetailActivity extends Activity {
 		
 		// setting the current context
 		_context = this;
+		
+		// setup interface singleton
+		InterfaceManager ifManager = new InterfaceManager(_context);
 		
 		// get the bundle extras from the intent
 		Bundle intentData = getIntent().getExtras();
@@ -140,11 +153,30 @@ public class DetailActivity extends Activity {
 				// create a URL object from the api strings
 				weatherURL = new URL(restStringA + selectedValue + restStringB);
 				
-				// creates the new request object
-				doRequest req = new doRequest();
+				Handler requestHandler = new Handler() 
+				{	
+					@Override
+					public void handleMessage(Message msg) {
+						// TODO Auto-generated method stub
+						super.handleMessage(msg);
+						
+						if (msg.arg1 == RESULT_OK && msg.obj != null)
+						{
+							// call the handleResult method to parse the JSON and update the UI
+							handleResult((String) msg.obj);
+						}
+					}
+				};
 				
-				// starts the request
-				req.execute(weatherURL);
+				// create the messenger object
+				Messenger intentMessenger = new Messenger(requestHandler);
+				
+				// create the service intent object and pass in the required extras
+				Intent thisService = ifManager.makeIntent(DetailService.class);
+				thisService.putExtra(URL_KEY, weatherURL).putExtra(MESSENGER_KEY, intentMessenger);
+				
+				// start up the service
+				startService(thisService);
 				
 			} catch (MalformedURLException e) {
 				Log.e("URL ERROR", "Malformed URL");
@@ -174,132 +206,104 @@ public class DetailActivity extends Activity {
 		return true;
 	}
 	
-	// android class thread for asynchronous requests
-	private class doRequest extends AsyncTask<URL, Void, String>
+	public void handleResult(String result)
 	{
+		// log the result text
+		Log.i("RESPONSE", result);
 		
-		@Override
-		protected String doInBackground(URL...urls)
-		{
-			// checks if there is a network connection
-			connected = IOManager.getConnectionStatus(_context);
+		// create JSON objects from the result string
+		// that object is then queried for the particular key and the string is returned and set
+		String tempf = JSONhandler.readJSONObject(result, "temp_F");
+		String humidityf = JSONhandler.readJSONObject(result, "humidity");
+		String condition = "";
+		String windSpeedm = JSONhandler.readJSONObject(result, "windspeedMiles");
+		String windDirection = JSONhandler.readJSONObject(result, "winddir16Point");
+		
+		// create a new separate JSON object
+		JSONObject cc = JSONhandler.returnJSONObject(result);
+		JSONArray extendedWeather;
+		
+		// create a weather data hashmap
+		HashMap<String, HashMap<String, String>> weatherData = new HashMap<String, HashMap<String, String>>();
+		
+		try {
+			// retrieve the deep nested weather condition string
+			condition = cc.getJSONObject("data").getJSONArray("current_condition").getJSONObject(0).getJSONArray("weatherDesc").getJSONObject(0).getString("value");
 			
-			// create a empty response string
-			String response = "";
-			
-			if (connected == true)
-			{
-				// loop for making url request with URLs 
-				for (URL url:urls)
-				{
-					// response gets set for each request made (in this instance just one)
-					response = IOManager.makeStringRequest(url);
-				}
-			}
-			// return the response text
-			return response;
+		} catch (JSONException e) {
+			Log.e("JSON ERROR", "JSON Exception parsing weather condition");
 		}
 		
-		@Override
-		protected void onPostExecute(String result)
-		{
-			// log the result text
-			Log.i("RESPONSE", result);
+		try {
+			// retrieve the deep nested extended weather array
+			extendedWeather = cc.getJSONObject("data").getJSONArray("weather");
 			
-			// create JSON objects from the result string
-			// that object is then queried for the particular key and the string is returned and set
-			String tempf = JSONhandler.readJSONObject(result, "temp_F");
-			String humidityf = JSONhandler.readJSONObject(result, "humidity");
-			String condition = "";
-			String windSpeedm = JSONhandler.readJSONObject(result, "windspeedMiles");
-			String windDirection = JSONhandler.readJSONObject(result, "winddir16Point");
-			
-			// create a new separate JSON object
-			JSONObject cc = JSONhandler.returnJSONObject(result);
-			JSONArray extendedWeather;
-			
-			// create a weather data hashmap
-			HashMap<String, HashMap<String, String>> weatherData = new HashMap<String, HashMap<String, String>>();
-			
-			try {
-				// retrieve the deep nested weather condition string
-				condition = cc.getJSONObject("data").getJSONArray("current_condition").getJSONObject(0).getJSONArray("weatherDesc").getJSONObject(0).getString("value");
-				
-			} catch (JSONException e) {
-				Log.e("JSON ERROR", "JSON Exception parsing weather condition");
-			}
-			
-			try {
-				// retrieve the deep nested extended weather array
-				extendedWeather = cc.getJSONObject("data").getJSONArray("weather");
-				
-				for (int i = 0; i < extendedWeather.length(); i++)
-				{
-					// create a hashmap for holding the current weather conditions at the index i
-					HashMap<String, String> thisCondition = new HashMap<String, String>();
-					
-					// get and set the JSON weather data into strings
-					String date = extendedWeather.getJSONObject(i).getString("date");
-					String tempHi = extendedWeather.getJSONObject(i).getString("tempMaxF");
-					String tempLo = extendedWeather.getJSONObject(i).getString("tempMinF");
-					String description = extendedWeather.getJSONObject(i).getJSONArray("weatherDesc").getJSONObject(0).getString("value");
-					String winDir = extendedWeather.getJSONObject(i).getString("winddir16Point");
-					String winSpd = extendedWeather.getJSONObject(i).getString("windspeedMiles");
-					
-					// put the individual conditions into the current weather hashmap
-					thisCondition.put("date", date);
-					thisCondition.put("temp_hi", tempHi);
-					thisCondition.put("temp_lo", tempLo);
-					thisCondition.put("condition", description);
-					thisCondition.put("wind_dir", winDir);
-					thisCondition.put("wind_spd", winSpd);
-					
-					// set the hashmap key for the weather data
-					String key = "day" + (i+1);
-					
-					// put the current weather hashmap inside the master weather data hashmap
-					weatherData.put(key, thisCondition);
-				}
-				
-			} catch (JSONException e) {
-				Log.e("JSON ERROR", "JSON Exception parsing extended weather");
-			}
-			
-			// set the detail view data
-			currentCondition.setText(condition);
-			humidity.setText(humidityf);
-			temp.setText(tempf);
-			windSpeed.setText(windSpeedm);
-			windDir.setText(windDirection);
-			
-			// save the hash to internal storage
-			FileSystem.writeObjectFile(_context, weatherData, "history", false);
-			
-			// verify that the weatherData is created properly
-			if (weatherData != null)
+			for (int i = 0; i < extendedWeather.length(); i++)
 			{
-				// set the forecast header text
-				forecastHeader.setText("5 Day Forecast");
+				// create a hashmap for holding the current weather conditions at the index i
+				HashMap<String, String> thisCondition = new HashMap<String, String>();
 				
-				// populate the weather data using the object file
-				populateWeather(weatherData);
+				// get and set the JSON weather data into strings
+				String date = extendedWeather.getJSONObject(i).getString("date");
+				String tempHi = extendedWeather.getJSONObject(i).getString("tempMaxF");
+				String tempLo = extendedWeather.getJSONObject(i).getString("tempMinF");
+				String description = extendedWeather.getJSONObject(i).getJSONArray("weatherDesc").getJSONObject(0).getString("value");
+				String winDir = extendedWeather.getJSONObject(i).getString("winddir16Point");
+				String winSpd = extendedWeather.getJSONObject(i).getString("windspeedMiles");
 				
-				// create a calendar object
-				Calendar cal = Calendar.getInstance();
+				// put the individual conditions into the current weather hashmap
+				thisCondition.put("date", date);
+				thisCondition.put("temp_hi", tempHi);
+				thisCondition.put("temp_lo", tempLo);
+				thisCondition.put("condition", description);
+				thisCondition.put("wind_dir", winDir);
+				thisCondition.put("wind_spd", winSpd);
 				
-				// get the numeric day value for the current day
-				int day = cal.get(Calendar.DAY_OF_WEEK);
+				// set the hashmap key for the weather data
+				String key = "day" + (i+1);
 				
-				// get the day values for the 5 day forcast
-				String[] week = returnNext5days(day);
-				
-				// set the actual day values for the dynamic weather forecast
-				day1.setText(week[0]);
-				day2.setText(week[1]);
-				day3.setText(week[2]);
-				day4.setText(week[3]);
-				day5.setText(week[4]);
+				// put the current weather hashmap inside the master weather data hashmap
+				weatherData.put(key, thisCondition);
 			}
+			
+		} catch (JSONException e) {
+			Log.e("JSON ERROR", "JSON Exception parsing extended weather");
+		}
+		
+		// set the detail view data
+		currentCondition.setText(condition);
+		humidity.setText(humidityf);
+		temp.setText(tempf);
+		windSpeed.setText(windSpeedm);
+		windDir.setText(windDirection);
+		
+		// save the hash to internal storage
+		FileSystem.writeObjectFile(_context, weatherData, "history", false);
+		
+		// verify that the weatherData is created properly
+		if (weatherData != null)
+		{
+			// set the forecast header text
+			forecastHeader.setText("5 Day Forecast");
+			
+			// populate the weather data using the object file
+			populateWeather(weatherData);
+			
+			// create a calendar object
+			Calendar cal = Calendar.getInstance();
+			
+			// get the numeric day value for the current day
+			int day = cal.get(Calendar.DAY_OF_WEEK);
+			
+			// get the day values for the 5 day forcast
+			String[] week = returnNext5days(day);
+			
+			// set the actual day values for the dynamic weather forecast
+			day1.setText(week[0]);
+			day2.setText(week[1]);
+			day3.setText(week[2]);
+			day4.setText(week[3]);
+			day5.setText(week[4]);
 		}
 	}
 	
@@ -374,41 +378,52 @@ public class DetailActivity extends Activity {
 	// method for populating the extended weather details
 	public void populateWeather(HashMap<String, HashMap<String, String>> hash)
 	{
+		
+		// temp strings for the temperature hi and lo and the wind speed and direction
 		String tempStr = " " + hash.get("day1").get("temp_hi") + "/" + hash.get("day1").get("temp_lo") + "F ";
 		String tempWin = " " + hash.get("day1").get("wind_dir") + " @ " + hash.get("day1").get("wind_spd") + "mph ";
 		
+		// set the text for the textviews from the passed in hashmap
 		day1.setText(" " + hash.get("day1").get("date") + " ");
 		day1temp.setText(tempStr);
 		day1wind.setText(tempWin);
 		day1condition.setText(" " + hash.get("day1").get("condition") + " ");
 		
+		// temp strings for the temperature hi and lo and the wind speed and direction
 		tempStr = " " + hash.get("day2").get("temp_hi") + "/" + hash.get("day2").get("temp_lo") + "F ";
 		tempWin = " " + hash.get("day2").get("wind_dir") + " @ " + hash.get("day2").get("wind_spd") + "mph ";
 		
+		// set the text for the textviews from the passed in hashmap
 		day2.setText(" " + hash.get("day2").get("date") + " ");
 		day2temp.setText(tempStr);
 		day2wind.setText(tempWin);
 		day2condition.setText(" " + hash.get("day2").get("condition") + " ");
 		
+		// temp strings for the temperature hi and lo and the wind speed and direction
 		tempStr = " " + hash.get("day3").get("temp_hi") + "/" + hash.get("day3").get("temp_lo") + "F ";
 		tempWin = " " + hash.get("day3").get("wind_dir") + " @ " + hash.get("day3").get("wind_spd") + "mph ";
 		
+		// set the text for the textviews from the passed in hashmap
 		day3.setText(" " + hash.get("day3").get("date") + " ");
 		day3temp.setText(tempStr);
 		day3wind.setText(tempWin);
 		day3condition.setText(" " + hash.get("day3").get("condition") + " ");
 		
+		// temp strings for the temperature hi and lo and the wind speed and direction
 		tempStr = " " + hash.get("day4").get("temp_hi") + "/" + hash.get("day4").get("temp_lo") + "F ";
 		tempWin = " " + hash.get("day4").get("wind_dir") + " @ " + hash.get("day4").get("wind_spd") + "mph ";
 		
+		// set the text for the textviews from the passed in hashmap
 		day4.setText(" " + hash.get("day4").get("date") + " ");
 		day4temp.setText(tempStr);
 		day4wind.setText(tempWin);
 		day4condition.setText(" " + hash.get("day4").get("condition") + " ");
 		
+		// temp strings for the temperature hi and lo and the wind speed and direction
 		tempStr = " " + hash.get("day5").get("temp_hi") + "/" + hash.get("day5").get("temp_lo") + "F ";
 		tempWin = " " + hash.get("day5").get("wind_dir") + " @ " + hash.get("day5").get("wind_spd") + "mph ";
 		
+		// set the text for the textviews from the passed in hashmap
 		day5.setText(" " + hash.get("day5").get("date") + " ");
 		day5temp.setText(tempStr);
 		day5wind.setText(tempWin);
