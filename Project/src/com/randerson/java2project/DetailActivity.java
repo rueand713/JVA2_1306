@@ -34,6 +34,7 @@ import android.os.Messenger;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 @SuppressLint("HandlerLeak")
@@ -84,6 +85,9 @@ public class DetailActivity extends Activity {
 	// Boolean for the connection status
 	Boolean connected;
 	
+	// setup toast object
+	Toast alert;
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +101,9 @@ public class DetailActivity extends Activity {
 		
 		// setup interface singleton
 		InterfaceManager ifManager = new InterfaceManager(_context);
+		
+		// create a toast from the singleton
+		alert = ifManager.createToast("", false);
 		
 		// get the bundle extras from the intent
 		Bundle intentData = getIntent().getExtras();
@@ -153,6 +160,10 @@ public class DetailActivity extends Activity {
 				// create a URL object from the api strings
 				weatherURL = new URL(restStringA + selectedValue + restStringB);
 				
+				// show a toast to inform the user of current action
+				alert.setText("Making URL request...");
+				alert.show();
+				
 				Handler requestHandler = new Handler() 
 				{	
 					@Override
@@ -195,6 +206,10 @@ public class DetailActivity extends Activity {
 				
 				// set the forecast header text
 				forecastHeader.setText("5 Day Forecast (cached)");
+				
+				// show a toast to inform the user of current action
+				alert.setText("Loaded saved weather data");
+				alert.show();
 			}
 		}
 	}
@@ -208,6 +223,10 @@ public class DetailActivity extends Activity {
 	
 	public void handleResult(String result)
 	{
+		// show a toast to inform the user of current action
+		alert.setText("URL request complete");
+		alert.show();
+		
 		// log the result text
 		Log.i("RESPONSE", result);
 		

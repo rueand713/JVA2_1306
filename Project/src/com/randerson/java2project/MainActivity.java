@@ -25,7 +25,7 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-	// create a new InterfaceManager object
+	// instantiate the InterfaceManager singleton
 	InterfaceManager UIFactory;
 			
 	// instantiate a new intent
@@ -46,10 +46,10 @@ public class MainActivity extends Activity {
 		
 		setContentView(R.layout.radioform);
 		
-		// create a new InterfaceManager object
+		// call the InterfaceManager singleton constructor
 		UIFactory = new InterfaceManager(this);
 		
-		// instantiate a new intent
+		// instantiate a new intent from the singleton
 		detailsView = UIFactory.makeIntent(DetailActivity.class);
 		
 		// set the context
@@ -111,8 +111,8 @@ public class MainActivity extends Activity {
 		{
 			String conType = IOManager.getConnectionType(this);
 			
-			// create the Toast object
-			Toast msg = UIFactory.createToast("", true);
+			// create the Toast object with the singleton
+			Toast msg = UIFactory.createToast("", false);
 			
 			if (connected == true)
 			{
