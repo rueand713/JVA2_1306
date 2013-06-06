@@ -1,3 +1,13 @@
+/*
+ * project 		Java2Project
+ * 
+ * package 		com.randerson.java2project
+ * 
+ * @author 		Rueben Anderson
+ * 
+ * date			Jun 6, 2013
+ * 
+ */
 package com.randerson.java2project;
 
 import java.net.URL;
