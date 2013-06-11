@@ -35,6 +35,7 @@
             </intent-filter>
         </activity>
         <service android:name="DetailService"></service>
+        <provider android:name="systemPack.ProviderManager" android:exported="true" android:authorities="com.randerson.java2project.providermanager"></provider>
     </application>
 
 </manifest>
