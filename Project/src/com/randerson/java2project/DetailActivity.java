@@ -12,10 +12,8 @@ package com.randerson.java2project;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Calendar;
 import java.util.HashMap;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,6 +41,7 @@ public class DetailActivity extends Activity {
 	// token identifiers for the service class
 	public static final String MESSENGER_KEY = "Messenger";
 	public static final String URL_KEY = "Url";
+	public static final String JSON_SAVE_FILE = "JsonWeather";
 	
 	// setup the views for weather detail layout
 	TextView currentCondition;
@@ -173,8 +172,11 @@ public class DetailActivity extends Activity {
 						
 						if (msg.arg1 == RESULT_OK && msg.obj != null)
 						{
+							// save the JSON string to the device
+							FileSystem.writeStringFile(_context, (String)msg.obj, JSON_SAVE_FILE, true);
+							
 							// call the handleResult method to parse the JSON and update the UI
-							handleResult((String) msg.obj);
+							//handleResult((String) msg.obj);
 						}
 					}
 				};
@@ -240,10 +242,10 @@ public class DetailActivity extends Activity {
 		
 		// create a new separate JSON object
 		JSONObject cc = JSONhandler.returnJSONObject(result);
-		JSONArray extendedWeather;
+		//JSONArray extendedWeather;
 		
 		// create a weather data hashmap
-		HashMap<String, HashMap<String, String>> weatherData = new HashMap<String, HashMap<String, String>>();
+		//HashMap<String, HashMap<String, String>> weatherData = new HashMap<String, HashMap<String, String>>();
 		
 		try {
 			// retrieve the deep nested weather condition string
@@ -253,7 +255,7 @@ public class DetailActivity extends Activity {
 			Log.e("JSON ERROR", "JSON Exception parsing weather condition");
 		}
 		
-		try {
+		/*try {
 			// retrieve the deep nested extended weather array
 			extendedWeather = cc.getJSONObject("data").getJSONArray("weather");
 			
@@ -287,7 +289,7 @@ public class DetailActivity extends Activity {
 			
 		} catch (JSONException e) {
 			Log.e("JSON ERROR", "JSON Exception parsing extended weather");
-		}
+		}*/
 		
 		// set the detail view data
 		currentCondition.setText(condition);
@@ -297,10 +299,10 @@ public class DetailActivity extends Activity {
 		windDir.setText(windDirection);
 		
 		// save the hash to internal storage
-		FileSystem.writeObjectFile(_context, weatherData, "history", false);
+		//FileSystem.writeObjectFile(_context, weatherData, "history", false);
 		
 		// verify that the weatherData is created properly
-		if (weatherData != null)
+		/*if (weatherData != null)
 		{
 			// set the forecast header text
 			forecastHeader.setText("5 Day Forecast");
@@ -323,7 +325,7 @@ public class DetailActivity extends Activity {
 			day3.setText(week[2]);
 			day4.setText(week[3]);
 			day5.setText(week[4]);
-		}
+		}*/
 	}
 	
 	// method for returning a string array of next 5 days beginning with the current day
