@@ -12,8 +12,8 @@ package com.randerson.java2project;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,6 +33,9 @@ import android.os.Message;
 import android.os.Messenger;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -74,6 +77,9 @@ public class DetailActivity extends Activity {
 	TextView day5condition;
 	TextView forecastHeader;
 	
+	// setup the listview
+	ListView list;
+	
 	// setup the memory hash object
 	HashMap<String, HashMap<String, String>> memHash;
 	
@@ -99,6 +105,9 @@ public class DetailActivity extends Activity {
 		
 		// setting the current context
 		_context = this;
+		
+		// create the listview from layout file
+		list = (ListView) findViewById(R.id.list);
 		
 		// setup interface singleton
 		InterfaceManager ifManager = new InterfaceManager(_context);
@@ -212,7 +221,7 @@ public class DetailActivity extends Activity {
 				populateWeather(memHash);
 				
 				// set the forecast header text
-				forecastHeader.setText("5 Day Forecast (cached)");
+				forecastHeader.setText("Forecast (cached)");
 				
 				// show a toast to inform the user of current action
 				alert.setText("Loaded saved weather data");
@@ -256,8 +265,13 @@ public class DetailActivity extends Activity {
 			Log.e("JSON ERROR", "JSON Exception parsing weather condition");
 		}
 		
+		// create a hashmap for holding the full weather condition
+		HashMap<String, HashMap<String, String>> weatherData = new HashMap<String, HashMap<String, String>>();
+		
+		// move the cursor to the first row
 		cursorResult.moveToFirst();
 		
+		// iterate through the cursor object for each row
 		for (int i = 0; i < cursorResult.getCount(); i++)
 		{
 			// create a hashmap for holding the current weather conditions
@@ -266,50 +280,23 @@ public class DetailActivity extends Activity {
 			// create string array for iterating through and saving column keys
 			String[] keys = {"date", "temp", "wind", "condition"};
 			
+			// iterate through the cursor object for each column
 			for (int j = 1; j < cursorResult.getColumnCount(); j++)
 			{
-				String str = cursorResult.getString(j);
+				// create a string with the current column string
+				String value = cursorResult.getString(j);
+				
+				thisCondition.put(keys[j-1], value);
 		
-				Log.i("Rows", str);
+				Log.i("Rows", value);
 			}
 			
+			// put the completed hashmap thisCondition into the weatherData hashmap 
+			weatherData.put("day" + (i+1), thisCondition);
+			
+			// move the cursor to the next row
 			cursorResult.moveToNext();
 		}
-		
-		/*try {
-			// retrieve the deep nested extended weather array
-			extendedWeather = cc.getJSONObject("data").getJSONArray("weather");
-			
-			for (int i = 0; i < extendedWeather.length(); i++)
-			{
-				
-				
-				// get and set the JSON weather data into strings
-				String date = extendedWeather.getJSONObject(i).getString("date");
-				String tempHi = extendedWeather.getJSONObject(i).getString("tempMaxF");
-				String tempLo = extendedWeather.getJSONObject(i).getString("tempMinF");
-				String description = extendedWeather.getJSONObject(i).getJSONArray("weatherDesc").getJSONObject(0).getString("value");
-				String winDir = extendedWeather.getJSONObject(i).getString("winddir16Point");
-				String winSpd = extendedWeather.getJSONObject(i).getString("windspeedMiles");
-				
-				// put the individual conditions into the current weather hashmap
-				thisCondition.put("date", date);
-				thisCondition.put("temp_hi", tempHi);
-				thisCondition.put("temp_lo", tempLo);
-				thisCondition.put("condition", description);
-				thisCondition.put("wind_dir", winDir);
-				thisCondition.put("wind_spd", winSpd);
-				
-				// set the hashmap key for the weather data
-				String key = "day" + (i+1);
-				
-				// put the current weather hashmap inside the master weather data hashmap
-				weatherData.put(key, thisCondition);
-			}
-			
-		} catch (JSONException e) {
-			Log.e("JSON ERROR", "JSON Exception parsing extended weather");
-		}*/
 		
 		// set the detail view data
 		currentCondition.setText(condition);
@@ -319,24 +306,24 @@ public class DetailActivity extends Activity {
 		windDir.setText(windDirection);
 		
 		// save the hash to internal storage
-		//FileSystem.writeObjectFile(_context, weatherData, "history", false);
+		FileSystem.writeObjectFile(_context, weatherData, "history", false);
 		
 		// verify that the weatherData is created properly
-		/*if (weatherData != null)
+		if (weatherData != null)
 		{
 			// set the forecast header text
-			forecastHeader.setText("5 Day Forecast");
+			forecastHeader.setText("Forecast");
 			
 			// populate the weather data using the object file
 			populateWeather(weatherData);
 			
-			// create a calendar object
+		/*	// create a calendar object
 			Calendar cal = Calendar.getInstance();
 			
 			// get the numeric day value for the current day
 			int day = cal.get(Calendar.DAY_OF_WEEK);
 			
-			// get the day values for the 5 day forcast
+			// get the day values for the 5 day forecast
 			String[] week = returnNext5days(day);
 			
 			// set the actual day values for the dynamic weather forecast
@@ -345,7 +332,8 @@ public class DetailActivity extends Activity {
 			day3.setText(week[2]);
 			day4.setText(week[3]);
 			day5.setText(week[4]);
-		}*/
+			*/
+		}
 	}
 	
 	// method for returning a string array of next 5 days beginning with the current day
@@ -419,56 +407,68 @@ public class DetailActivity extends Activity {
 	// method for populating the extended weather details
 	public void populateWeather(HashMap<String, HashMap<String, String>> hash)
 	{
+		list.setVisibility(View.VISIBLE);
 		
-		// temp strings for the temperature hi and lo and the wind speed and direction
-		String tempStr = " " + hash.get("day1").get("temp_hi") + "/" + hash.get("day1").get("temp_lo") + "F ";
-		String tempWin = " " + hash.get("day1").get("wind_dir") + " @ " + hash.get("day1").get("wind_spd") + "mph ";
+		ArrayList<HashMap<String, String>> listArray = new ArrayList<HashMap<String, String>>();
 		
-		// set the text for the textviews from the passed in hashmap
+		for (int i = 0; i < hash.size(); i++)
+		{	
+			// create a new hashmap for holding weather details
+			HashMap<String, String> listMap = new HashMap<String, String>();
+			
+			// create string array for iterating through and saving column keys
+			String[] keys = {"date", "temp", "wind", "condition"};
+			
+			// iterate the map for each key
+			for (int j = 0; j < keys.length; j++)
+			{
+				// create a string for each hash value
+				String value = hash.get("day" + (i+1)).get(keys[j]);
+				
+				// add the extracted value to the new hashmap
+				listMap.put(keys[j], value);
+			}
+			
+			// add the hashmap to the listarray
+			listArray.add(listMap);
+		}
+		
+		SimpleAdapter listAdapter = new SimpleAdapter(this, listArray, R.layout.listdetails, 
+				new String[] {"date", "temp", "wind", "condition"}, new int[] {R.id.day, R.id.temp, R.id.wind, R.id.condition});
+		
+		// set the list view adapter
+		list.setAdapter(listAdapter);
+		
+		/*// set the text for the textviews from the passed in hashmap
 		day1.setText(" " + hash.get("day1").get("date") + " ");
-		day1temp.setText(tempStr);
-		day1wind.setText(tempWin);
+		day1temp.setText(" " + hash.get("day1").get("temp") + " ");
+		day1wind.setText(" " + hash.get("day1").get("wind") + " ");
 		day1condition.setText(" " + hash.get("day1").get("condition") + " ");
-		
-		// temp strings for the temperature hi and lo and the wind speed and direction
-		tempStr = " " + hash.get("day2").get("temp_hi") + "/" + hash.get("day2").get("temp_lo") + "F ";
-		tempWin = " " + hash.get("day2").get("wind_dir") + " @ " + hash.get("day2").get("wind_spd") + "mph ";
-		
+
 		// set the text for the textviews from the passed in hashmap
 		day2.setText(" " + hash.get("day2").get("date") + " ");
-		day2temp.setText(tempStr);
-		day2wind.setText(tempWin);
+		day2temp.setText(" " + hash.get("day2").get("temp") + " ");
+		day2wind.setText(" " + hash.get("day2").get("wind") + " ");
 		day2condition.setText(" " + hash.get("day2").get("condition") + " ");
-		
-		// temp strings for the temperature hi and lo and the wind speed and direction
-		tempStr = " " + hash.get("day3").get("temp_hi") + "/" + hash.get("day3").get("temp_lo") + "F ";
-		tempWin = " " + hash.get("day3").get("wind_dir") + " @ " + hash.get("day3").get("wind_spd") + "mph ";
 		
 		// set the text for the textviews from the passed in hashmap
 		day3.setText(" " + hash.get("day3").get("date") + " ");
-		day3temp.setText(tempStr);
-		day3wind.setText(tempWin);
+		day3temp.setText(" " + hash.get("day3").get("temp") + " ");
+		day3wind.setText(" " + hash.get("day3").get("wind") + " ");
 		day3condition.setText(" " + hash.get("day3").get("condition") + " ");
-		
-		// temp strings for the temperature hi and lo and the wind speed and direction
-		tempStr = " " + hash.get("day4").get("temp_hi") + "/" + hash.get("day4").get("temp_lo") + "F ";
-		tempWin = " " + hash.get("day4").get("wind_dir") + " @ " + hash.get("day4").get("wind_spd") + "mph ";
 		
 		// set the text for the textviews from the passed in hashmap
 		day4.setText(" " + hash.get("day4").get("date") + " ");
-		day4temp.setText(tempStr);
-		day4wind.setText(tempWin);
+		day4temp.setText(" " + hash.get("day4").get("temp") + " ");
+		day4wind.setText(" " + hash.get("day4").get("wind") + " ");
 		day4condition.setText(" " + hash.get("day4").get("condition") + " ");
-		
-		// temp strings for the temperature hi and lo and the wind speed and direction
-		tempStr = " " + hash.get("day5").get("temp_hi") + "/" + hash.get("day5").get("temp_lo") + "F ";
-		tempWin = " " + hash.get("day5").get("wind_dir") + " @ " + hash.get("day5").get("wind_spd") + "mph ";
 		
 		// set the text for the textviews from the passed in hashmap
 		day5.setText(" " + hash.get("day5").get("date") + " ");
-		day5temp.setText(tempStr);
-		day5wind.setText(tempWin);
+		day5temp.setText(" " + hash.get("day5").get("temp") + " ");
+		day5wind.setText(" " + hash.get("day5").get("wind") + " ");
 		day5condition.setText(" " + hash.get("day5").get("condition") + " ");
+	*/
 	}
 
 }

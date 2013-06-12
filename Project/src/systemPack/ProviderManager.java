@@ -1,7 +1,5 @@
 package systemPack;
 
-import java.util.HashMap;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -133,9 +131,6 @@ public class ProviderManager extends ContentProvider {
 			return cursorResult;
 		}
 		
-		// create a weather data hashmap
-		HashMap<String, HashMap<String, String>> weatherData = new HashMap<String, HashMap<String, String>>();
-		
 		switch(uriMatcher.match(uri))
 		{
 		case ALL_DAYS:
@@ -143,9 +138,6 @@ public class ProviderManager extends ContentProvider {
 			Log.i("Array count", weatherArray.length() + "");
 			for (int i = 0; i < weatherArray.length(); i++)
 			{
-				// create a hashmap for holding the current weather conditions at the index i
-				HashMap<String, String> thisCondition = new HashMap<String, String>();
-				
 				try {
 					// get and set the JSON weather data into strings
 					String date = weatherArray.getJSONObject(i).getString("date");
@@ -155,36 +147,20 @@ public class ProviderManager extends ContentProvider {
 					String winDir = weatherArray.getJSONObject(i).getString("winddir16Point");
 					String winSpd = weatherArray.getJSONObject(i).getString("windspeedMiles");
 					
-					// put the individual conditions into the current weather hashmap
-					thisCondition.put("date", date);
-					thisCondition.put("temp_hi", tempHi);
-					thisCondition.put("temp_lo", tempLo);
-					thisCondition.put("condition", description);
-					thisCondition.put("wind_dir", winDir);
-					thisCondition.put("wind_spd", winSpd);
-					
 					//integer id key
 					int ID = (i + 1);
 					
 					// create the object array of the weather data
-					Object[] columnValues = {ID, date, (tempHi + " / " + tempLo), (winDir + " @ " + winSpd + "mph"), description};
+					Object[] columnValues = {ID, date, (tempHi + " / " + tempLo + " F"), (winDir + " @ " + winSpd + " mph"), description};
 					
 					// add the row of data to the matrix cursor
 					cursorResult.addRow(columnValues);
 				
-				// set the hashmap key for the weather data
-				String key = "day" + ID;
-				
-				// put the current weather hashmap inside the master weather data hashmap
-				weatherData.put(key, thisCondition);
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-			
-			// save the hash to internal storage
-			FileSystem.writeObjectFile(getContext(), weatherData, "history", false);
 			
 			return cursorResult;
 			
