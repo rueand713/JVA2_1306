@@ -21,10 +21,12 @@ import systemPack.FileSystem;
 import systemPack.IOManager;
 import systemPack.InterfaceManager;
 import systemPack.JSONhandler;
+import systemPack.ProviderManager.ProviderData;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -173,10 +175,13 @@ public class DetailActivity extends Activity {
 						if (msg.arg1 == RESULT_OK && msg.obj != null)
 						{
 							// save the JSON string to the device
-							FileSystem.writeStringFile(_context, (String)msg.obj, JSON_SAVE_FILE, true);
+							FileSystem.writeObjectFile(_context, msg.obj, JSON_SAVE_FILE, false);
+							
+							//ProviderManager provider = new ProviderManager();
+							Cursor cRes = getContentResolver().query(ProviderData.CONTENT_URI, null, null, null, null);
 							
 							// call the handleResult method to parse the JSON and update the UI
-							//handleResult((String) msg.obj);
+							handleResult((String) msg.obj, cRes);
 						}
 					}
 				};
@@ -223,7 +228,7 @@ public class DetailActivity extends Activity {
 		return true;
 	}
 	
-	public void handleResult(String result)
+	public void handleResult(String result, Cursor cursorResult)
 	{
 		// show a toast to inform the user of current action
 		alert.setText("URL request complete");
@@ -242,10 +247,6 @@ public class DetailActivity extends Activity {
 		
 		// create a new separate JSON object
 		JSONObject cc = JSONhandler.returnJSONObject(result);
-		//JSONArray extendedWeather;
-		
-		// create a weather data hashmap
-		//HashMap<String, HashMap<String, String>> weatherData = new HashMap<String, HashMap<String, String>>();
 		
 		try {
 			// retrieve the deep nested weather condition string
@@ -255,14 +256,33 @@ public class DetailActivity extends Activity {
 			Log.e("JSON ERROR", "JSON Exception parsing weather condition");
 		}
 		
+		cursorResult.moveToFirst();
+		
+		for (int i = 0; i < cursorResult.getCount(); i++)
+		{
+			// create a hashmap for holding the current weather conditions
+			HashMap<String, String> thisCondition = new HashMap<String, String>();
+			
+			// create string array for iterating through and saving column keys
+			String[] keys = {"date", "temp", "wind", "condition"};
+			
+			for (int j = 1; j < cursorResult.getColumnCount(); j++)
+			{
+				String str = cursorResult.getString(j);
+		
+				Log.i("Rows", str);
+			}
+			
+			cursorResult.moveToNext();
+		}
+		
 		/*try {
 			// retrieve the deep nested extended weather array
 			extendedWeather = cc.getJSONObject("data").getJSONArray("weather");
 			
 			for (int i = 0; i < extendedWeather.length(); i++)
 			{
-				// create a hashmap for holding the current weather conditions at the index i
-				HashMap<String, String> thisCondition = new HashMap<String, String>();
+				
 				
 				// get and set the JSON weather data into strings
 				String date = extendedWeather.getJSONObject(i).getString("date");

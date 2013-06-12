@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 public class ProviderManager extends ContentProvider {
 
@@ -108,7 +109,7 @@ public class ProviderManager extends ContentProvider {
 		MatrixCursor cursorResult = new MatrixCursor(ProviderData.PROJECTION);
 		
 		// read string from saved system file
-		String jsonString = FileSystem.readStringFile(getContext(), JSON_SAVE_FILE, true);
+		String jsonString = (String) FileSystem.readObjectFile(getContext(), JSON_SAVE_FILE, false);
 		
 		// create the json object from the saved file string
 		JSONObject readObject = JSONhandler.returnJSONObject(jsonString);
@@ -128,6 +129,7 @@ public class ProviderManager extends ContentProvider {
 		// if empty, return the empty array otherwise continue to match the uri
 		if (weatherArray == null)
 		{
+			Log.i("Null", "weather array is null");
 			return cursorResult;
 		}
 		
@@ -137,6 +139,8 @@ public class ProviderManager extends ContentProvider {
 		switch(uriMatcher.match(uri))
 		{
 		case ALL_DAYS:
+			Log.i("All Days", "matched all days uri");
+			Log.i("Array count", weatherArray.length() + "");
 			for (int i = 0; i < weatherArray.length(); i++)
 			{
 				// create a hashmap for holding the current weather conditions at the index i
@@ -169,7 +173,7 @@ public class ProviderManager extends ContentProvider {
 					cursorResult.addRow(columnValues);
 				
 				// set the hashmap key for the weather data
-				String key = "day" + (i+1);
+				String key = "day" + ID;
 				
 				// put the current weather hashmap inside the master weather data hashmap
 				weatherData.put(key, thisCondition);
@@ -181,7 +185,8 @@ public class ProviderManager extends ContentProvider {
 			
 			// save the hash to internal storage
 			FileSystem.writeObjectFile(getContext(), weatherData, "history", false);
-			break;
+			
+			return cursorResult;
 			
 		case SINGLE_DAY:
 			
