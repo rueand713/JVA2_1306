@@ -21,12 +21,14 @@ import systemPack.FileSystem;
 import systemPack.IOManager;
 import systemPack.InterfaceManager;
 import systemPack.JSONhandler;
+import systemPack.ProviderManager;
 import systemPack.ProviderManager.ProviderData;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -55,26 +57,6 @@ public class DetailActivity extends Activity {
 	TextView windSpeed;
 	TextView windDir;
 	TextView header;
-	TextView day1;
-	TextView day2;
-	TextView day3;
-	TextView day4;
-	TextView day5;
-	TextView day1temp;
-	TextView day2temp;
-	TextView day3temp;
-	TextView day4temp;
-	TextView day5temp;
-	TextView day1wind;
-	TextView day2wind;
-	TextView day3wind;
-	TextView day4wind;
-	TextView day5wind;
-	TextView day1condition;
-	TextView day2condition;
-	TextView day3condition;
-	TextView day4condition;
-	TextView day5condition;
 	TextView forecastHeader;
 	
 	// setup the listview
@@ -94,6 +76,9 @@ public class DetailActivity extends Activity {
 	
 	// setup toast object
 	Toast alert;
+	
+	// the query type
+	String querySelection;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -118,8 +103,9 @@ public class DetailActivity extends Activity {
 		// get the bundle extras from the intent
 		Bundle intentData = getIntent().getExtras();
 		
-		// get the passed in selected string from the bundle
+		// get the passed in selected strings from the bundle
 		String selectedValue = intentData.getString("selected");
+		querySelection = intentData.getString("query");
 		
 		// api request string parts
 		// the strings will be concatenated with the selected location and passed as the request
@@ -137,26 +123,6 @@ public class DetailActivity extends Activity {
 		humidity = (TextView) findViewById(R.id.humiditycondition);
 		windSpeed = (TextView) findViewById(R.id.winspdcondition);
 		windDir = (TextView) findViewById(R.id.windircondition);
-		day1 = (TextView) findViewById(R.id.day1);
-		day2 = (TextView) findViewById(R.id.day2);
-		day3 = (TextView) findViewById(R.id.day3);
-		day4 = (TextView) findViewById(R.id.day4);
-		day5 = (TextView) findViewById(R.id.day5);
-		day1temp = (TextView) findViewById(R.id.day1_temp);
-		day2temp = (TextView) findViewById(R.id.day2_temp);
-		day3temp = (TextView) findViewById(R.id.day3_temp);
-		day4temp = (TextView) findViewById(R.id.day4_temp);
-		day5temp = (TextView) findViewById(R.id.day5_temp);
-		day1wind = (TextView) findViewById(R.id.day1_wind);
-		day2wind = (TextView) findViewById(R.id.day2_wind);
-		day3wind = (TextView) findViewById(R.id.day3_wind);
-		day4wind = (TextView) findViewById(R.id.day4_wind);
-		day5wind = (TextView) findViewById(R.id.day5_wind);
-		day1condition = (TextView) findViewById(R.id.day1_condition);
-		day2condition = (TextView) findViewById(R.id.day2_condition);
-		day3condition = (TextView) findViewById(R.id.day3_condition);
-		day4condition = (TextView) findViewById(R.id.day4_condition);
-		day5condition = (TextView) findViewById(R.id.day5_condition);
 		forecastHeader = (TextView) findViewById(R.id.forcastheader);
 		
 		// get the connection status
@@ -186,8 +152,20 @@ public class DetailActivity extends Activity {
 							// save the JSON string to the device
 							FileSystem.writeObjectFile(_context, msg.obj, JSON_SAVE_FILE, false);
 							
-							//ProviderManager provider = new ProviderManager();
-							Cursor cRes = getContentResolver().query(ProviderData.CONTENT_URI, null, null, null, null);
+							// set the uri to default to the content uri
+							Uri queryUri = ProviderData.CONTENT_URI;
+							
+							// check if the user opted to query a single day
+							if (querySelection.equals("All") == false)
+							{
+								char queryValue = querySelection.charAt(0);
+								
+								// set the single item content uri
+								queryUri = Uri.parse("content://" + ProviderManager.AUTHORITY + "/days/" + queryValue);
+							}
+							
+							// query the provider and capture returned cursor
+							Cursor cRes = getContentResolver().query(queryUri, null, null, null, null);
 							
 							// call the handleResult method to parse the JSON and update the UI
 							handleResult((String) msg.obj, cRes);
@@ -286,6 +264,7 @@ public class DetailActivity extends Activity {
 				// create a string with the current column string
 				String value = cursorResult.getString(j);
 				
+				// put the value into the weather hashmap
 				thisCondition.put(keys[j-1], value);
 		
 				Log.i("Rows", value);
@@ -409,7 +388,18 @@ public class DetailActivity extends Activity {
 	{
 		list.setVisibility(View.VISIBLE);
 		
+		// create a new hashmap list array
 		ArrayList<HashMap<String, String>> listArray = new ArrayList<HashMap<String, String>>();
+		
+		// create a new hashmap for the title values
+		HashMap<String, String> headerMap = new HashMap<String, String>();
+		headerMap.put("date", "DAY");
+		headerMap.put("temp", "TEMP");
+		headerMap.put("wind", "WIND");
+		headerMap.put("condition", "COND");
+		
+		// add the header hashmap to the list array
+		listArray.add(headerMap);
 		
 		for (int i = 0; i < hash.size(); i++)
 		{	
@@ -433,42 +423,12 @@ public class DetailActivity extends Activity {
 			listArray.add(listMap);
 		}
 		
+		// create simple adapter for list view
 		SimpleAdapter listAdapter = new SimpleAdapter(this, listArray, R.layout.listdetails, 
 				new String[] {"date", "temp", "wind", "condition"}, new int[] {R.id.day, R.id.temp, R.id.wind, R.id.condition});
 		
 		// set the list view adapter
 		list.setAdapter(listAdapter);
-		
-		/*// set the text for the textviews from the passed in hashmap
-		day1.setText(" " + hash.get("day1").get("date") + " ");
-		day1temp.setText(" " + hash.get("day1").get("temp") + " ");
-		day1wind.setText(" " + hash.get("day1").get("wind") + " ");
-		day1condition.setText(" " + hash.get("day1").get("condition") + " ");
-
-		// set the text for the textviews from the passed in hashmap
-		day2.setText(" " + hash.get("day2").get("date") + " ");
-		day2temp.setText(" " + hash.get("day2").get("temp") + " ");
-		day2wind.setText(" " + hash.get("day2").get("wind") + " ");
-		day2condition.setText(" " + hash.get("day2").get("condition") + " ");
-		
-		// set the text for the textviews from the passed in hashmap
-		day3.setText(" " + hash.get("day3").get("date") + " ");
-		day3temp.setText(" " + hash.get("day3").get("temp") + " ");
-		day3wind.setText(" " + hash.get("day3").get("wind") + " ");
-		day3condition.setText(" " + hash.get("day3").get("condition") + " ");
-		
-		// set the text for the textviews from the passed in hashmap
-		day4.setText(" " + hash.get("day4").get("date") + " ");
-		day4temp.setText(" " + hash.get("day4").get("temp") + " ");
-		day4wind.setText(" " + hash.get("day4").get("wind") + " ");
-		day4condition.setText(" " + hash.get("day4").get("condition") + " ");
-		
-		// set the text for the textviews from the passed in hashmap
-		day5.setText(" " + hash.get("day5").get("date") + " ");
-		day5temp.setText(" " + hash.get("day5").get("temp") + " ");
-		day5wind.setText(" " + hash.get("day5").get("wind") + " ");
-		day5condition.setText(" " + hash.get("day5").get("condition") + " ");
-	*/
 	}
 
 }

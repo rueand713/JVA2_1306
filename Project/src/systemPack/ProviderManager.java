@@ -31,9 +31,9 @@ public class ProviderManager extends ContentProvider {
 		
 		// define the colums
 		public static final String DATE_COL = "DAY";
-		public static final String TEMP_COL = "TEMPERATURE";
+		public static final String TEMP_COL = "TEMP";
 		public static final String WIND_COL = "WIND";
-		public static final String COND_COL = "CONDITIONS";
+		public static final String COND_COL = "COND";
 		
 		// create the projection string array
 		public static final String[] PROJECTION = {"_Id", DATE_COL, TEMP_COL, WIND_COL, COND_COL};
@@ -135,7 +135,8 @@ public class ProviderManager extends ContentProvider {
 		{
 		case ALL_DAYS:
 			Log.i("All Days", "matched all days uri");
-			Log.i("Array count", weatherArray.length() + "");
+			
+			// iterate through the weather array extracting the JSON string data
 			for (int i = 0; i < weatherArray.length(); i++)
 			{
 				try {
@@ -157,21 +158,59 @@ public class ProviderManager extends ContentProvider {
 					cursorResult.addRow(columnValues);
 				
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Log.e("JSON EXCEPTION", "in all days json handling in provider");
 				}
 			}
 			
 			return cursorResult;
 			
 		case SINGLE_DAY:
+			Log.i("Single Day", "matched single days uri");
 			
-			break;
+			// extract the last character from the string
+			String strId = uri.getLastPathSegment();
+			
+			// int for holding the selected day
+			int day;
+			
+			try {
+				// try to convert the string number to int
+				day = Integer.parseInt(strId);
+				
+				// decrement by 1 for array
+				day -= 1;
+				
+				try {
+					// get and set the JSON weather data into strings
+					String date = weatherArray.getJSONObject(day).getString("date");
+					String tempHi = weatherArray.getJSONObject(day).getString("tempMaxF");
+					String tempLo = weatherArray.getJSONObject(day).getString("tempMinF");
+					String description = weatherArray.getJSONObject(day).getJSONArray("weatherDesc").getJSONObject(0).getString("value");
+					String winDir = weatherArray.getJSONObject(day).getString("winddir16Point");
+					String winSpd = weatherArray.getJSONObject(day).getString("windspeedMiles");
+					
+					//integer id key
+					int ID = (day + 1);
+					
+					// create the object array of the weather data
+					Object[] columnValues = {ID, date, (tempHi + " / " + tempLo + " F"), (winDir + " @ " + winSpd + " mph"), description};
+					
+					// add the row of data to the matrix cursor
+					cursorResult.addRow(columnValues);
+				
+				} catch (JSONException e) {
+					Log.e("JSON EXCEPTION", "in single day json handling in provider");
+				}
+				
+			} catch (NumberFormatException e) {
+				Log.e("NumberFormatException", "in trying to parse single day str to integer in provider");
+			}
+			
+			return cursorResult;
 			
 			default:
 				break;
 		}
-		
 		
 		return null;
 	}

@@ -22,7 +22,14 @@
     <string name="current">Current Weather</string>
     <string name="day_field">Day </string>
     <string name="temp_field"> Temp </string>
-    <string name="humidity_field"> Humidity </string>
+    <string name="wind_field"> Wind </string>
     <string name="condition_field"> Condition</string>
+    <string name="query_instruct">Select forecast to query</string>
+    <string name="queryday1">1st day</string>
+    <string name="queryday2">2nd day</string>
+    <string name="queryday3">3rd day</string>
+    <string name="queryday4">4th day</string>
+    <string name="queryday5">5th day</string>
+    <string name="queryall">All</string>
     
 </resources>

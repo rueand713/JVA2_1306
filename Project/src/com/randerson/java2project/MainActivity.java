@@ -39,6 +39,7 @@ public class MainActivity extends Activity {
 	
 	// setup the radio group
 	RadioGroup radios;
+	RadioGroup querys;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +62,8 @@ public class MainActivity extends Activity {
 		// call the method for displaying the toast
 		displayToast();
 	
-		// sets the radiogroup 
+		// sets the radiogroups
+		querys = (RadioGroup) findViewById(R.id.querychoice);
 		radios = (RadioGroup) findViewById(R.id.locales);
 		
 		// creates the button with the UIFactory instance
@@ -79,20 +81,26 @@ public class MainActivity extends Activity {
 				// call the method for displaying the toast
 				displayToast();
 				
-				// get the id of the currently selected radio button
+				// get the id of the currently selected radio buttons
 				int selectedId = radios.getCheckedRadioButtonId();
+				int queryId = querys.getCheckedRadioButtonId();
 				
-				// create an instance of the radio button that is currently selected
+				// create an instance of the radio buttons that are currently selected
 				RadioButton rBtn = (RadioButton) findViewById(selectedId);
+				RadioButton qBtn = (RadioButton) findViewById(queryId);
 				
-				// do a quick check to make sure that a selected button is returned
-				if (rBtn != null)
+				// do a quick check to make sure that the selected buttons are returned
+				if (rBtn != null && qBtn != null)
 				{
 					// retrieve the selected button text value from the instance
 					String selectedValue = rBtn.getText().toString();
+					String queryValue = qBtn.getText().toString();
 				
+					// store the strings for the new intent
 					detailsView.putExtra("selected", selectedValue);
+					detailsView.putExtra("query", queryValue);
 						
+					// start the new activity
 					startActivity(detailsView);
 				}
 			}
