@@ -1,3 +1,13 @@
+/*
+ * project 		Java2AndroidWeather
+ * 
+ * package 		com.randerson.java2androidweather
+ * 
+ * @author 		Rueben Anderson
+ * 
+ * date			Jun 17, 2013
+ * 
+ */
 package com.randerson.java2androidweather;
 
 import android.os.Bundle;
