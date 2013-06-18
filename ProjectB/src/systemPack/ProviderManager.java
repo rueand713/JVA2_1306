@@ -25,7 +25,7 @@ import android.util.Log;
 public class ProviderManager extends ContentProvider {
 
 	// create the provider AUTHORITY string
-	public static final String AUTHORITY = "com.randerson.java2project.providermanager";
+	public static final String AUTHORITY = "com.randerson.java2androidweather.providermanager";
 	
 	// create the constant JSON file key
 	public static final String JSON_SAVE_FILE = "JsonWeather";
@@ -36,8 +36,8 @@ public class ProviderManager extends ContentProvider {
 		public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/days");
 		
 		// create the constant strings for the content types
-		public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.randerson.java2project.item";
-		public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.randerson.java2project.item";
+		public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.randerson.java2androidweather.item";
+		public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.randerson.java2androidweather.item";
 		
 		// define the colums
 		public static final String DATE_COL = "DAY";

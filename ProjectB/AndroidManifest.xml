@@ -7,6 +7,10 @@
     <uses-sdk
         android:minSdkVersion="17"
         android:targetSdkVersion="17" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -22,6 +26,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:exported="true" android:name="DetailService"></service>
+        <provider android:name="systemPack.ProviderManager" android:authorities="com.randerson.java2androidweather.providermanager"></provider>
     </application>
 
 </manifest>

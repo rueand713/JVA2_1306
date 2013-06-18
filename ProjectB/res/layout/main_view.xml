@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    style="@style/AppBaseTheme"
+    >
+    
+    <Button android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Query Options"/>
+        
+        <TextView android:id="@+id/forcastheader" 
+            	android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/blank"
+                style="@style/Titles"
+                />
+        
+        <TableLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            
+            <TableRow>
+            <TextView android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="DAY"
+                />
+       
+             <TextView android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="TEMP"
+                />
+             
+              <TextView android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="WIND"
+                />
+            
+               <TextView android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="COND"
+                />
+               </TableRow>
+               
+            <TableRow>
+                <ListView android:id="@+id/list"
+		            android:layout_width="match_parent"
+		            android:layout_height="wrap_content"
+		            android:padding="3dp"
+            	></ListView>
+            </TableRow>
+              
+        </TableLayout>
+    
+</LinearLayout>

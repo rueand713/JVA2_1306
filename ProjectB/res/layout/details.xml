@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+<LinearLayout
+    android:id="@+id/mainll"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    style="@style/AppBaseTheme">
+    
+    <TextView android:id="@+id/title"
+        android:layout_width="match_parent" 
+        android:layout_height="wrap_content" 
+        android:paddingBottom="10dip"
+        android:text="@string/titletext"
+        style="@style/Titles"
+    />
+
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        
+        <TextView android:id="@+id/instructions"
+            android:layout_width="match_parent" 
+	        android:layout_height="wrap_content" 
+	        android:paddingBottom="10dip"
+	        android:text="@string/instructions"
+	        style="@style/Titles"
+    	/>
+        
+        <RadioGroup android:id="@+id/locales" android:layout_width="wrap_content" 
+        	android:layout_height="match_parent" android:paddingBottom="5dip">
+	        <RadioButton android:text="@string/houston" style="@style/RadioStyle"/>
+	        <RadioButton android:text="@string/chicago" style="@style/RadioStyle"/>
+	        <RadioButton android:text="@string/miami" style="@style/RadioStyle"/>
+	        <RadioButton android:text="@string/seattle" style="@style/RadioStyle"/>
+    	</RadioGroup>
+    	
+        <TextView android:id="@+id/querydirection"
+            android:layout_width="match_parent" 
+	        android:layout_height="wrap_content" 
+	        android:paddingBottom="10dip"
+	        android:text="@string/query_instruct"
+	        style="@style/Titles"
+    	/>
+    	
+        <RadioGroup android:id="@+id/querychoice" android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <RadioButton android:text="@string/queryday1" style="@style/RadioStyle"/>
+            <RadioButton android:text="@string/queryday2" style="@style/RadioStyle"/>
+            <RadioButton android:text="@string/queryday3" style="@style/RadioStyle"/>
+            <RadioButton android:text="@string/queryday4" style="@style/RadioStyle"/>
+            <RadioButton android:text="@string/queryday5" style="@style/RadioStyle"/>
+            <RadioButton android:text="@string/queryall" style="@style/RadioStyle"/>
+        </RadioGroup>
+        
+    </LinearLayout>
+    
+    <Button android:id="@+id/weather_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/buttontext"
+    />
+
+</LinearLayout>
+</ScrollView>
