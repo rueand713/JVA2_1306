@@ -28,6 +28,13 @@
         </activity>
         <service android:exported="true" android:name="DetailService"></service>
         <provider android:name="systemPack.ProviderManager" android:authorities="com.randerson.java2androidweather.providermanager"></provider>
+        <activity android:name="com.randerson.java2androidweather.DetailActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
