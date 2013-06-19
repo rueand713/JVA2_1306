@@ -41,5 +41,14 @@
     <style name="ImageStyle">
         <item name="android:drawablePadding">10dip</item>
     </style>
+    
+    <style name="TableStyle">
+        <item name="android:padding">10dip</item>
+    </style>
+    
+    <style name="CellStyle">
+        <item name="android:paddingLeft">5dip</item>
+        <item name="android:paddingRight">5dip</item>
+    </style>
 
 </resources>

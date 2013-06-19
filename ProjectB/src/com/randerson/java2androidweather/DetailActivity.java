@@ -2,65 +2,46 @@ package com.randerson.java2androidweather;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import com.randerson.java2androidweather.DetailService;
 
 import systemPack.FileSystem;
 import systemPack.IOManager;
 import systemPack.InterfaceManager;
-import systemPack.JSONhandler;
-import systemPack.ProviderManager;
-import systemPack.ProviderManager.ProviderData;
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
+import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
-
 
 @SuppressLint("HandlerLeak")
 public class DetailActivity extends Activity {
-	
+
 	// token identifiers for the service class
-	public static final String MESSENGER_KEY = "Messenger";
-	public static final String URL_KEY = "Url";
-	public static final String JSON_SAVE_FILE = "JsonWeather";
-	
-	// setup the views for weather detail layout
-	TextView currentCondition;
-	TextView temp;
-	TextView humidity;
-	TextView windSpeed;
-	TextView windDir;
-	TextView header;
-	TextView forecastHeader;
-	
-	// setup the listview
-	ListView list;
-	
-	// setup the memory hash object
-	HashMap<String, HashMap<String, String>> memHash;
-	
-	// setup the context
-	Context _context;
-	
+		public static final String MESSENGER_KEY = "Messenger";
+		public static final String URL_KEY = "Url";
+		public static final String JSON_SAVE_FILE = "JsonWeather";
+		
+	// instantiate the InterfaceManager singleton
+	InterfaceManager UIFactory;
+			
+	// instantiate a new intent
+	Intent detailsView;
+		
 	// URL for the get request
 	URL weatherURL;
-	
+		
 	// Boolean for the connection status
 	Boolean connected;
 	
@@ -70,32 +51,47 @@ public class DetailActivity extends Activity {
 	// the query type
 	String querySelection;
 	
-	@SuppressWarnings("unchecked")
+	// set the context
+	Context _context;
+	
+	// setup the radio group
+	RadioGroup radios;
+	RadioGroup querys;
+	
+	// set the handler and messenger objects
+	Handler requestHandler;
+	Messenger intentMessenger;
+	
+	// setup radio string
+	String selectedValue;
+	
+	// object array for return data
+	HashMap<String, Object> returnData;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		// set the content view
 		setContentView(R.layout.details);
 		
-		// setting the current context
+		// call the InterfaceManager singleton constructor
+		UIFactory = new InterfaceManager(this);
+		
+		// set the context
 		_context = this;
 		
-		// create the listview from layout file
-		list = (ListView) findViewById(R.id.list);
+		// checks if there is a network connection
+		connected = IOManager.getConnectionStatus(this);
 		
-		// setup interface singleton
-		InterfaceManager ifManager = new InterfaceManager(_context);
+		// call the method for displaying the toast
+		displayToast();
+	
+		// sets the radiogroups
+		querys = (RadioGroup) findViewById(R.id.querychoice);
+		radios = (RadioGroup) findViewById(R.id.locales);
 		
-		// create a toast from the singleton
-		alert = ifManager.createToast("", false);
-		
-		// get the bundle extras from the intent
-		Bundle intentData = getIntent().getExtras();
-		
-		// get the passed in selected strings from the bundle
-		String selectedValue = intentData.getString("selected");
-		querySelection = intentData.getString("query");
+		// setup the alert toast object
+		alert = UIFactory.createToast("", false);
 		
 		// api request string parts
 		// the strings will be concatenated with the selected location and passed as the request
@@ -103,89 +99,106 @@ public class DetailActivity extends Activity {
 		final String restStringA = "http://api.worldweatheronline.com/free/v1/weather.ashx?q=";
 		final String restStringB = "&format=json&num_of_days=5&key=" + apiKey;
 		
-		// get the connection status
-		connected = IOManager.getConnectionStatus(_context);
+		// the request handler object recieves the message from the service, writes the message to file storage
+		// queries the provider for user selection and then returns that data to the calling activity
+		requestHandler = new Handler() 
+		{	
+			@Override
+			public void handleMessage(Message msg) {
+				// TODO Auto-generated method stub
+				super.handleMessage(msg);
+				
+				if (msg.arg1 == RESULT_OK && msg.obj != null)
+				{
+					// save the JSON string to the device
+					FileSystem.writeObjectFile(_context, msg.obj, JSON_SAVE_FILE, false);
+					
+					// Create container object
+					returnData = new HashMap<String, Object>();
+					
+					returnData.put("result", ((String) msg.obj));
+					returnData.put("query", querySelection);
+					
+					// call method to end activity
+					finish();
+				}
+			}
+		};
 		
-		// verify that there is a connected
-		// if true try the url request otherwise load previous weather data
-		if (connected)
-		{
-			try {
-				// create a URL object from the api strings
-				weatherURL = new URL(restStringA + selectedValue + restStringB);
+		// create the messenger object
+		intentMessenger = new Messenger(requestHandler);
+		
+		// creates the button with the UIFactory instance
+		Button sendBtn = (Button) findViewById(R.id.weather_btn);
+		
+		// set up the on click for the send button
+		sendBtn.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
 				
-				// show a toast to inform the user of current action
-				alert.setText("Making URL request...");
-				alert.show();
+				// checks if there is a network connection
+				connected = IOManager.getConnectionStatus(_context);
 				
-				Handler requestHandler = new Handler() 
+				// call the method for displaying the toast
+				displayToast();
+				
+				// get the id of the currently selected radio buttons
+				int selectedId = radios.getCheckedRadioButtonId();
+				int queryId = querys.getCheckedRadioButtonId();
+				
+				// create an instance of the radio buttons that are currently selected
+				RadioButton rBtn = (RadioButton) findViewById(selectedId);
+				RadioButton qBtn = (RadioButton) findViewById(queryId);
+				
+				// do a quick check to make sure that the selected buttons are returned
+				if (rBtn != null && qBtn != null)
 				{	
-					@Override
-					public void handleMessage(Message msg) {
-						// TODO Auto-generated method stub
-						super.handleMessage(msg);
-						
-						if (msg.arg1 == RESULT_OK && msg.obj != null)
-						{
-							// save the JSON string to the device
-							FileSystem.writeObjectFile(_context, msg.obj, JSON_SAVE_FILE, false);
+					// retrieve the selected button text value from the instance
+					selectedValue = rBtn.getText().toString();
+					querySelection = qBtn.getText().toString();
+					
+					if (connected)
+					{
+						try {
+							// create a URL object from the api strings
+							weatherURL = new URL(restStringA + selectedValue + restStringB);
 							
-							// set the uri to default to the content uri
-							Uri queryUri = ProviderData.CONTENT_URI;
-							
-							// check if the user opted to query a single day
-							if (querySelection.equals("All") == false)
-							{
-								char queryValue = querySelection.charAt(0);
+							// show a toast to inform the user of current action
+							alert.setText("Making URL request...");
+							alert.show();
 								
-								// set the single item content uri
-								queryUri = Uri.parse("content://" + ProviderManager.AUTHORITY + "/days/" + queryValue);
-							}
+							// create the service intent object and pass in the required extras
+							Intent thisService = UIFactory.makeIntent(DetailService.class);
+							thisService.putExtra(URL_KEY, weatherURL).putExtra(MESSENGER_KEY, intentMessenger);
 							
-							// query the provider and capture returned cursor
-							Cursor cRes = getContentResolver().query(queryUri, null, null, null, null);
+							// start up the service
+							startService(thisService);
 							
-							// call the handleResult method to parse the JSON and update the UI
-							handleResult((String) msg.obj, cRes);
+						} catch (MalformedURLException e) {
+							Log.e("MALFORMED URL", "weather URL try/catch block");
 						}
 					}
-				};
-				
-				// create the messenger object
-				Messenger intentMessenger = new Messenger(requestHandler);
-				
-				// create the service intent object and pass in the required extras
-				Intent thisService = ifManager.makeIntent(DetailService.class);
-				thisService.putExtra(URL_KEY, weatherURL).putExtra(MESSENGER_KEY, intentMessenger);
-				
-				// start up the service
-				startService(thisService);
-				
-			} catch (MalformedURLException e) {
-				Log.e("URL ERROR", "Malformed URL");
+				}
 			}
-		}
-		else if (!connected)
-		{
-			// load the previous hashfile
-			memHash = (HashMap<String, HashMap<String, String>>) FileSystem.readObjectFile(this, "history", false);
-			
-			// adds previous values if they exist in file
-			if (memHash != null)
-			{
-				// populate the weather data using the object file
-				populateWeather(memHash);
-				
-				// set the forecast header text
-				forecastHeader.setText("Forecast (cached)");
-				
-				// show a toast to inform the user of current action
-				alert.setText("Loaded saved weather data");
-				alert.show();
-			}
-		}
+		});
 	}
-	
+
+	@Override
+	public void finish() {
+		
+		Log.i("Detail Activity", "Finish Method");
+		
+		// create an intent to pass back to the calling activity
+		Intent data = new Intent();
+		
+		// store the return data in the intent extras
+		data.putExtra("data", returnData);
+		
+		setResult(RESULT_OK, data);
+		super.finish();
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -193,220 +206,26 @@ public class DetailActivity extends Activity {
 		return true;
 	}
 	
-	public void handleResult(String result, Cursor cursorResult)
-	{
-		// show a toast to inform the user of current action
-		alert.setText("URL request complete");
-		alert.show();
-		
-		// log the result text
-		Log.i("RESPONSE", result);
-		
-		// create JSON objects from the result string
-		// that object is then queried for the particular key and the string is returned and set
-		String tempf = JSONhandler.readJSONObject(result, "temp_F");
-		String humidityf = JSONhandler.readJSONObject(result, "humidity");
-		String condition = "";
-		String windSpeedm = JSONhandler.readJSONObject(result, "windspeedMiles");
-		String windDirection = JSONhandler.readJSONObject(result, "winddir16Point");
-		
-		// create a new separate JSON object
-		JSONObject cc = JSONhandler.returnJSONObject(result);
-		
-		try {
-			// retrieve the deep nested weather condition string
-			condition = cc.getJSONObject("data").getJSONArray("current_condition").getJSONObject(0).getJSONArray("weatherDesc").getJSONObject(0).getString("value");
-			
-		} catch (JSONException e) {
-			Log.e("JSON ERROR", "JSON Exception parsing weather condition");
-		}
-		
-		// create a hashmap for holding the full weather condition
-		HashMap<String, HashMap<String, String>> weatherData = new HashMap<String, HashMap<String, String>>();
-		
-		// move the cursor to the first row
-		cursorResult.moveToFirst();
-		
-		// iterate through the cursor object for each row
-		for (int i = 0; i < cursorResult.getCount(); i++)
+	// method for showing the proper toast
+		private void displayToast()
 		{
-			// create a hashmap for holding the current weather conditions
-			HashMap<String, String> thisCondition = new HashMap<String, String>();
+			String conType = IOManager.getConnectionType(this);
 			
-			// create string array for iterating through and saving column keys
-			String[] keys = {"date", "temp", "wind", "condition"};
+			// create the Toast object with the singleton
+			Toast msg = UIFactory.createToast("", false);
 			
-			// iterate through the cursor object for each column
-			for (int j = 1; j < cursorResult.getColumnCount(); j++)
+			if (connected == true)
 			{
-				// create a string with the current column string
-				String value = cursorResult.getString(j);
-				
-				// put the value into the weather hashmap
-				thisCondition.put(keys[j-1], value);
-		
-				Log.i("Rows", value);
+				// set the toast text
+				msg.setText(conType + "Network detected");
+			}
+			else
+			{
+				// set the toast text
+				msg.setText("No Connection");
 			}
 			
-			// put the completed hashmap thisCondition into the weatherData hashmap 
-			weatherData.put("day" + (i+1), thisCondition);
-			
-			// move the cursor to the next row
-			cursorResult.moveToNext();
+			// show the toast
+			msg.show();
 		}
-		
-		// set the detail view data
-		currentCondition.setText(condition);
-		humidity.setText(humidityf);
-		temp.setText(tempf);
-		windSpeed.setText(windSpeedm);
-		windDir.setText(windDirection);
-		
-		// save the hash to internal storage
-		FileSystem.writeObjectFile(_context, weatherData, "history", false);
-		
-		// verify that the weatherData is created properly
-		if (weatherData != null)
-		{
-			// set the forecast header text
-			forecastHeader.setText("Forecast");
-			
-			// populate the weather data using the object file
-			populateWeather(weatherData);
-			
-		/*	// create a calendar object
-			Calendar cal = Calendar.getInstance();
-			
-			// get the numeric day value for the current day
-			int day = cal.get(Calendar.DAY_OF_WEEK);
-			
-			// get the day values for the 5 day forecast
-			String[] week = returnNext5days(day);
-			
-			// set the actual day values for the dynamic weather forecast
-			day1.setText(week[0]);
-			day2.setText(week[1]);
-			day3.setText(week[2]);
-			day4.setText(week[3]);
-			day5.setText(week[4]);
-			*/
-		}
-	}
-	
-	// method for returning a string array of next 5 days beginning with the current day
-	public String[] returnNext5days(int dayId)
-	{
-		// set the final day id
-		int endDay = 5;
-		
-		// create a string array with a capacity of 5
-		String[] day = new String[5];
-		
-		// iterate through the 
-		for (int i = 0; i < endDay; i++)
-		{
-			// check if the dayId is greater than 7 (Saturday)
-			if (dayId > 7)
-			{
-				// sub the previous week
-				dayId -= 7;
-			}
-			
-			// create a new empty string
-			String thisDay = "";
-			
-			// set the thisDay string based on the value of the dayId
-			switch(dayId)
-			{
-			case 1:
-				thisDay = "Sunday";
-				break;
-				
-			case 2:
-				thisDay = "Monday";
-				break;
-				
-			case 3:
-				thisDay = "Tuesday";
-				break;
-				
-			case 4:
-				thisDay = "Wednesday";
-				break;
-				
-			case 5:
-				thisDay = "Thursday";
-				break;
-				
-			case 6:
-				thisDay = "Friday";
-				break;
-				
-			case 7:
-				thisDay = "Saturday";
-				break;
-				
-				default:
-					break;
-			}
-			
-			// set the current index of the string array
-			day[i] = thisDay;
-			
-			// increment the dayId
-			dayId++;
-		}
-		
-		// return the object
-		return day;
-	}
-	
-	// method for populating the extended weather details
-	public void populateWeather(HashMap<String, HashMap<String, String>> hash)
-	{
-		list.setVisibility(View.VISIBLE);
-		
-		// create a new hashmap list array
-		ArrayList<HashMap<String, String>> listArray = new ArrayList<HashMap<String, String>>();
-		
-		// create a new hashmap for the title values
-		HashMap<String, String> headerMap = new HashMap<String, String>();
-		headerMap.put("date", "DAY");
-		headerMap.put("temp", "TEMP");
-		headerMap.put("wind", "WIND");
-		headerMap.put("condition", "COND");
-		
-		// add the header hashmap to the list array
-		listArray.add(headerMap);
-		
-		for (int i = 0; i < hash.size(); i++)
-		{	
-			// create a new hashmap for holding weather details
-			HashMap<String, String> listMap = new HashMap<String, String>();
-			
-			// create string array for iterating through and saving column keys
-			String[] keys = {"date", "temp", "wind", "condition"};
-			
-			// iterate the map for each key
-			for (int j = 0; j < keys.length; j++)
-			{
-				// create a string for each hash value
-				String value = hash.get("day" + (i+1)).get(keys[j]);
-				
-				// add the extracted value to the new hashmap
-				listMap.put(keys[j], value);
-			}
-			
-			// add the hashmap to the listarray
-			listArray.add(listMap);
-		}
-		
-		// create simple adapter for list view
-		SimpleAdapter listAdapter = new SimpleAdapter(this, listArray, R.layout.listdetails, 
-				new String[] {"date", "temp", "wind", "condition"}, new int[] {R.id.day, R.id.temp, R.id.wind, R.id.condition});
-		
-		// set the list view adapter
-		list.setAdapter(listAdapter);
-	}
-
 }

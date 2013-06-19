@@ -12,18 +12,17 @@
     <string name="chicago">Chicago</string>
     <string name="miami">Miami</string>
     <string name="seattle">Seattle</string>
-    <string name="condition">Condition </string>
-    <string name="humidity">Humidity </string>
-    <string name="temp">Temperature </string>
-    <string name="winspd">Wind Speed </string>
-    <string name="windir">Wind Direction </string>
+    <string name="condition">Condition</string>
+    <string name="temp">Temperature</string>
+    <string name="winspd">Wind Speed</string>
+    <string name="windir">Wind Direction</string>
     <string name="logo">App Logo</string>
     <string name="blank"> </string>
     <string name="current">Current Weather</string>
-    <string name="day_field">Day </string>
-    <string name="temp_field"> Temp </string>
-    <string name="wind_field"> Wind </string>
-    <string name="condition_field"> Condition</string>
+    <string name="day_field">DAY</string>
+    <string name="temp_field">TEMP</string>
+    <string name="wind_field">WIND</string>
+    <string name="condition_field">COND</string>
     <string name="query_instruct">Select forecast to query</string>
     <string name="queryday1">1st day</string>
     <string name="queryday2">2nd day</string>
@@ -31,5 +30,6 @@
     <string name="queryday4">4th day</string>
     <string name="queryday5">5th day</string>
     <string name="queryall">All</string>
+    <string name="query_btn">Query Options</string>
     
 </resources>

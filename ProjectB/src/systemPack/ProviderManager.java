@@ -40,10 +40,10 @@ public class ProviderManager extends ContentProvider {
 		public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.randerson.java2androidweather.item";
 		
 		// define the colums
-		public static final String DATE_COL = "DAY";
-		public static final String TEMP_COL = "TEMP";
-		public static final String WIND_COL = "WIND";
-		public static final String COND_COL = "COND";
+		public static final String DATE_COL = "date";
+		public static final String TEMP_COL = "temp";
+		public static final String WIND_COL = "wind";
+		public static final String COND_COL = "condition";
 		
 		// create the projection string array
 		public static final String[] PROJECTION = {"_Id", DATE_COL, TEMP_COL, WIND_COL, COND_COL};

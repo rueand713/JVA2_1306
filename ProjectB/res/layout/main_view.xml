@@ -6,9 +6,10 @@
     style="@style/AppBaseTheme"
     >
     
-    <Button android:layout_width="match_parent"
+    <Button android:id="@+id/querybtn"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Query Options"/>
+        android:text="@string/query_btn"/>
         
         <TextView android:id="@+id/forcastheader" 
             	android:layout_width="wrap_content"
@@ -18,29 +19,55 @@
                 />
         
         <TableLayout android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            style="@style/TableStyle"
+            >
             
             <TableRow>
             <TextView android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="DAY"
+                android:text="@string/day_field"
+                style="@style/WeatherTitles"
                 />
        
              <TextView android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="TEMP"
+                android:text="@string/temp_field"
+                style="@style/WeatherTitles"
                 />
              
               <TextView android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="WIND"
+                android:text="@string/wind_field"
+                style="@style/WeatherTitles"
                 />
             
                <TextView android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="COND"
+                android:text="@string/condition_field"
+                style="@style/WeatherTitles"
                 />
                </TableRow>
+               
+            <TableRow 
+                android:id="@+id/cell_day1">
+            </TableRow>  
+            
+            <TableRow
+                android:id="@+id/cell_day2">
+            </TableRow>
+            
+            <TableRow
+                android:id="@+id/cell_day3">
+            </TableRow>
+            
+            <TableRow
+                android:id="@+id/cell_day4">
+            </TableRow>
+            
+            <TableRow
+                android:id="@+id/cell_day5">
+            </TableRow>
                
             <TableRow>
                 <ListView android:id="@+id/list"
