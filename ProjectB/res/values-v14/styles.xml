@@ -22,10 +22,13 @@
         <item name="android:textColor">@android:color/holo_orange_light</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
+        <item name="android:background">@android:color/holo_red_light</item>
+        <item name="android:maxEms">5</item>
+        
     </style>
     
     <style name="WeatherInfo">
-        <item name="android:textColor">@android:color/darker_gray</item>
+        <item name="android:textColor">@android:color/holo_red_light</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">italic</item>
     </style>

@@ -11,6 +11,7 @@
 package com.randerson.java2androidweather;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import org.json.JSONException;
@@ -96,7 +97,7 @@ public class MainActivity extends Activity {
 			if (memHash != null)
 			{
 				// populate the weather data using the object file
-				populateWeather(memHash);
+				populateWeather(memHash, -1);
 				
 				// set the forecast header text
 				headerText.setText("Forecast (cached)");
@@ -160,7 +161,7 @@ public class MainActivity extends Activity {
 			Cursor cRes = getContentResolver().query(queryUri, null, null, null, null);
 			
 			// call the handleResult method to parse the JSON and update the UI
-			handleResult(result, cRes);
+			handleResult(result, cRes, querySelection);
 		}
 	}
 
@@ -171,8 +172,26 @@ public class MainActivity extends Activity {
 		return true;
 	}
 	
-	public void handleResult(String result, Cursor cursorResult)
+	public void handleResult(String result, Cursor cursorResult, String queryString)
 	{
+		// set the default value for all dates
+		int queryDay = 0;
+		
+		// check if the query string is for all or a single day
+		if (queryString.equals("All") == false)
+		{
+			// grab the first character for single day query
+			queryString = queryString.charAt(0) + "";
+			
+			try
+			{
+				queryDay = Integer.parseInt(queryString);
+			}
+			catch (NumberFormatException e) {
+				Log.e("Format Error", "Error parsing the querystring to integer");
+			}
+		}
+		
 		// show a toast to inform the user of current action
 		alert.setText("URL request complete");
 		alert.show();
@@ -250,24 +269,7 @@ public class MainActivity extends Activity {
 			headerText.setText("Forecast");
 			
 			// populate the weather data using the object file
-			populateWeather(weatherData);
-			
-		/*	// create a calendar object
-			Calendar cal = Calendar.getInstance();
-			
-			// get the numeric day value for the current day
-			int day = cal.get(Calendar.DAY_OF_WEEK);
-			
-			// get the day values for the 5 day forecast
-			String[] week = returnNext5days(day);
-			
-			// set the actual day values for the dynamic weather forecast
-			day1.setText(week[0]);
-			day2.setText(week[1]);
-			day3.setText(week[2]);
-			day4.setText(week[3]);
-			day5.setText(week[4]);
-			*/
+			populateWeather(weatherData, queryDay);
 		}
 	}
 	
@@ -340,8 +342,17 @@ public class MainActivity extends Activity {
 	}
 	
 	// method for populating the extended weather details
-	public void populateWeather(HashMap<String, HashMap<String, String>> hash)
+	public void populateWeather(HashMap<String, HashMap<String, String>> hash, int targetDay)
 	{
+		// create a calendar object
+		Calendar cal = Calendar.getInstance();
+		
+		// get the numeric day value for the current day
+		int weekday = cal.get(Calendar.DAY_OF_WEEK);
+		
+		// get the day values for the 5 day forecast
+		String[] week = returnNext5days(weekday);
+					
 		list.setVisibility(View.VISIBLE);
 		
 		// create a new hashmap list array
@@ -389,6 +400,20 @@ public class MainActivity extends Activity {
 		// iterate through the listarray and set the appropriate table rows with the data
 		for (int i = 0; i < listArray.size(); i++)
 		{
+			int cellColor;
+			
+			// set the cellColor integer based on whether i returns a remainder
+			if (i % 2 > 0)
+			{
+				// set the color for a white
+				cellColor = getResources().getColor(android.R.color.white);
+			}
+			else
+			{
+				// set the color for a dark gray
+				cellColor = getResources().getColor(android.R.color.darker_gray);
+			}
+			
 			// create a new hash map object
 			HashMap<String, String> data = new HashMap<String, String>();
 			
@@ -403,9 +428,26 @@ public class MainActivity extends Activity {
 			
 			// add cell styling
 			day.setPadding(0, 5, 20, 1);
+			day.setBackgroundColor(cellColor);
 			temp.setPadding(0, 5, 20, 1);
+			temp.setBackgroundColor(cellColor);
 			wind.setPadding(0, 5, 20, 1);
+			wind.setBackgroundColor(cellColor);
 			cond.setPadding(0, 5, 20, 1);
+			cond.setBackgroundColor(cellColor);
+			
+			// set the actual day value for the weather forecast
+			// 0 for full query | -1 for memory loaded population | >0 for single day query
+			if (targetDay == 0)
+			{
+				// user is querying all days so the week array should be referenced
+				day.setText(week[i]);
+			}
+			else if (targetDay > 0)
+			{
+				// user is querying only a single day use the passed in target day instead
+				day.setText(week[targetDay - 1]);
+			}
 			
 			// append the textviews to their parent text rows
 			rows[i].addView(day);

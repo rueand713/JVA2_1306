@@ -162,7 +162,7 @@ public class ProviderManager extends ContentProvider {
 					int ID = (i + 1);
 					
 					// create the object array of the weather data
-					Object[] columnValues = {ID, date, (tempHi + " / " + tempLo + " F"), (winDir + " @ " + winSpd + " mph"), description};
+					Object[] columnValues = {ID, date, (tempHi + " | " + tempLo + " F"), (winSpd + " mph " + winDir), description};
 					
 					// add the row of data to the matrix cursor
 					cursorResult.addRow(columnValues);
@@ -203,7 +203,7 @@ public class ProviderManager extends ContentProvider {
 					int ID = (day + 1);
 					
 					// create the object array of the weather data
-					Object[] columnValues = {ID, date, (tempHi + " / " + tempLo + " F"), (winDir + " @ " + winSpd + " mph"), description};
+					Object[] columnValues = {ID, date, (tempHi + " | " + tempLo + " F"), (winSpd + " mph " + winDir), description};
 					
 					// add the row of data to the matrix cursor
 					cursorResult.addRow(columnValues);
