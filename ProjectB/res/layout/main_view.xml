@@ -1,10 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     style="@style/AppBaseTheme"
     >
+    
+    <TextView android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/directions"
+                android:paddingBottom="5dip"
+                style="@style/Titles"
+                android:background="@android:color/white"
+         		android:textAlignment="center"
+                />
     
     <Button android:id="@+id/querybtn"
         android:layout_width="match_parent"
@@ -22,6 +35,7 @@
     <TableLayout android:id="@+id/current_weather"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        style="@style/TableStyle"
         >
         
         <TableRow>
@@ -34,7 +48,9 @@
         </TableRow>
         
         <TableRow>
-            <ImageView android:id="@+id/condition_image" android:contentDescription="@string/logo"/>
+            <ImageView android:id="@+id/condition_image" 
+                android:contentDescription="@string/logo"
+                style="@style/ImageStyle"/>
             
             <TextView android:id="@+id/current_cond"
                 android:text="@string/blank"
@@ -145,33 +161,31 @@
                </TableRow>
                
             <TableRow 
+                android:layout_height="wrap_content"
                 android:id="@+id/cell_day1">
             </TableRow>  
             
             <TableRow
+                android:layout_height="wrap_content"
                 android:id="@+id/cell_day2">
             </TableRow>
             
             <TableRow
+                android:layout_height="wrap_content"
                 android:id="@+id/cell_day3">
             </TableRow>
             
             <TableRow
+                android:layout_height="wrap_content"
                 android:id="@+id/cell_day4">
             </TableRow>
             
             <TableRow
+                android:layout_height="wrap_content"
                 android:id="@+id/cell_day5">
-            </TableRow>
-               
-            <TableRow>
-                <ListView android:id="@+id/list"
-		            android:layout_width="match_parent"
-		            android:layout_height="wrap_content"
-		            android:padding="3dp"
-            	></ListView>
             </TableRow>
               
         </TableLayout>
     
 </LinearLayout>
+</ScrollView>

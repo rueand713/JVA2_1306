@@ -189,13 +189,18 @@ public class DetailActivity extends Activity {
 		
 		Log.i("Detail Activity", "Finish Method");
 		
-		// create an intent to pass back to the calling activity
-		Intent data = new Intent();
+		// only set the data if the finish method was called from the handler
+		if (returnData != null)
+		{
+			// create an intent to pass back to the calling activity
+			Intent data = new Intent();
+			
+			// store the return data in the intent extras
+			data.putExtra("data", returnData);
+			
+			setResult(RESULT_OK, data);
+		}
 		
-		// store the return data in the intent extras
-		data.putExtra("data", returnData);
-		
-		setResult(RESULT_OK, data);
 		super.finish();
 	}
 

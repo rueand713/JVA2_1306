@@ -24,6 +24,7 @@ import systemPack.JSONhandler;
 import systemPack.ProviderManager;
 import systemPack.ProviderManager.ProviderData;
 
+import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.randerson.java2androidweather.R;
 
 import android.net.Uri;
@@ -36,7 +37,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ListView;
+import android.widget.ImageView;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,7 +52,10 @@ public class MainActivity extends Activity {
 	TextView wind;
 	
 	// setup the listview
-	ListView list;
+	//ListView list;
+	
+	// setup Image view
+	ImageView weatherView;
 	
 	// setup toast object
 	Toast alert;
@@ -79,6 +83,9 @@ public class MainActivity extends Activity {
 		
 		// create the listview from layout file
 		//list = (ListView) findViewById(R.id.list);
+		
+		// create the image view from the layout file
+		weatherView = (ImageView) findViewById(R.id.condition_image);
 		
 		// create the current condition text views from layout file
 		currentCondition = (TextView) findViewById(R.id.current_cond);
@@ -139,39 +146,44 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (resultCode == RESULT_OK && requestCode == 0)
+		
+		// make sure that data is not null
+		// this should alleviate app crashes when the user backs out
+		if (data != null)
 		{
-			Log.i("Main Activity", "On Activity Result");
-			
-			// retrieve the extras from the intent
-			Bundle returnData = data.getExtras();
-			
-			// retrieve the passed in hasmap from  the bundle
-			@SuppressWarnings("unchecked")
-			HashMap<String, Object> map = (HashMap<String, Object>) returnData.get("data");
-			
-			// retrieve the string from the obj array
-			String result = (String) map.get("result");
-			
-			String querySelection = (String) map.get("query");
-			
-			// set the uri to default to the content uri
-			Uri queryUri = ProviderData.CONTENT_URI;
-			
-			// check if the user opted to query a single day
-			if (querySelection.equals("All") == false)
+			if (resultCode == RESULT_OK && requestCode == 0)
 			{
-				char queryValue = querySelection.charAt(0);
+				Log.i("Main Activity", "On Activity Result");
 				
-				// set the single item content uri
-				queryUri = Uri.parse("content://" + ProviderManager.AUTHORITY + "/days/" + queryValue);
+				// retrieve the extras from the intent
+				Bundle returnData = data.getExtras();
+				
+				// retrieve the passed in hasmap from  the bundle
+				@SuppressWarnings("unchecked")
+				HashMap<String, Object> map = (HashMap<String, Object>) returnData.get("data");
+				
+				// retrieve the string from the obj array
+				String result = (String) map.get("result");
+				String querySelection = (String) map.get("query");
+				
+				// set the uri to default to the content uri
+				Uri queryUri = ProviderData.CONTENT_URI;
+				
+				// check if the user opted to query a single day
+				if (querySelection.equals("All") == false)
+				{
+					char queryValue = querySelection.charAt(0);
+					
+					// set the single item content uri
+					queryUri = Uri.parse("content://" + ProviderManager.AUTHORITY + "/days/" + queryValue);
+				}
+				
+				// query the provider and capture returned cursor
+				Cursor cRes = getContentResolver().query(queryUri, null, null, null, null);
+				
+				// call the handleResult method to parse the JSON and update the UI
+				handleResult(result, cRes, querySelection);
 			}
-			
-			// query the provider and capture returned cursor
-			Cursor cRes = getContentResolver().query(queryUri, null, null, null, null);
-			
-			// call the handleResult method to parse the JSON and update the UI
-			handleResult(result, cRes, querySelection);
 		}
 	}
 
@@ -215,13 +227,15 @@ public class MainActivity extends Activity {
 		String condition = "";
 		String windSpeedm = JSONhandler.readJSONObject(result, "windspeedMiles");
 		String windDirection = JSONhandler.readJSONObject(result, "winddir16Point");
+		String imageIcon = "";
 		
 		// create a new separate JSON object
 		JSONObject cc = JSONhandler.returnJSONObject(result);
 		
 		try {
-			// retrieve the deep nested weather condition string
+			// retrieve the deep nested weather condition string and icon url
 			condition = cc.getJSONObject("data").getJSONArray("current_condition").getJSONObject(0).getJSONArray("weatherDesc").getJSONObject(0).getString("value");
+			imageIcon = cc.getJSONObject("data").getJSONArray("current_condition").getJSONObject(0).getJSONArray("weatherIconUrl").getJSONObject(0).getString("value");
 			
 		} catch (JSONException e) {
 			Log.e("JSON ERROR", "JSON Exception parsing weather condition");
@@ -264,6 +278,10 @@ public class MainActivity extends Activity {
 		humidity.setText(humidityf + "%");
 		temp.setText(tempf + " F");
 		wind.setText(windSpeedm + " mph " + windDirection);
+		
+		// ********** THE UrlImageViewHelper IS A THIRD PARTY ANDROID LIBRARY ***********
+		// download and set the weather condition image
+		UrlImageViewHelper.setUrlDrawable(weatherView, imageIcon);
 		
 		// save the hash to internal storage
 		FileSystem.writeObjectFile(_context, weatherData, "history", false);
