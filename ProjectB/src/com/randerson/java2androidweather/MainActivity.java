@@ -68,6 +68,9 @@ public class MainActivity extends Activity {
 	
 	// create the UI singleton
 	InterfaceManager ifManager;
+	
+	// save bundle
+	Bundle saveState;
 		
 	// setup the memory hash object
 	HashMap<String, HashMap<String, String>> memHash;
@@ -141,6 +144,41 @@ public class MainActivity extends Activity {
 				startActivityForResult(detailIntent, 0);
 			}
 		});
+		
+		// check if there is saved data
+		if (savedInstanceState != null)
+		{
+			// create string objects from the stored data
+			String result = savedInstanceState.getString("result");
+			String query = savedInstanceState.getString("query");
+			
+			// pass in the stored data strings to repopulate the views
+			if (result != null && query != null)
+			{
+				handleResult(result, query);
+			}
+		}
+		
+	}
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+	
+		super.onSaveInstanceState(outState);
+		
+		if (saveState != null)
+		{
+			outState.putString("result", saveState.getString("result"));
+			outState.putString("query", saveState.getString("query"));
+		}
+		
+		Log.i("onSaveInstanceState", "Data state saved");
 	}
 
 	@Override
@@ -166,23 +204,8 @@ public class MainActivity extends Activity {
 				String result = (String) map.get("result");
 				String querySelection = (String) map.get("query");
 				
-				// set the uri to default to the content uri
-				Uri queryUri = ProviderData.CONTENT_URI;
-				
-				// check if the user opted to query a single day
-				if (querySelection.equals("All") == false)
-				{
-					char queryValue = querySelection.charAt(0);
-					
-					// set the single item content uri
-					queryUri = Uri.parse("content://" + ProviderManager.AUTHORITY + "/days/" + queryValue);
-				}
-				
-				// query the provider and capture returned cursor
-				Cursor cRes = getContentResolver().query(queryUri, null, null, null, null);
-				
 				// call the handleResult method to parse the JSON and update the UI
-				handleResult(result, cRes, querySelection);
+				handleResult(result, querySelection);
 			}
 		}
 	}
@@ -194,9 +217,31 @@ public class MainActivity extends Activity {
 		return true;
 	}
 	
-	public void handleResult(String result, Cursor cursorResult, String queryString)
-	{
+	public void handleResult(String result, String queryString)
+	{	
 		
+		// create the savestate bundle
+		saveState = new Bundle();
+		
+		// store the result and query strings for the save state
+		saveState.putString("result", result);
+		saveState.putString("query", queryString);
+		
+		// set the uri to default to the content uri
+		Uri queryUri = ProviderData.CONTENT_URI;
+		
+		// check if the user opted to query a single day
+		if (queryString.equals("All") == false)
+		{
+			char queryValue = queryString.charAt(0);
+			
+			// set the single item content uri
+			queryUri = Uri.parse("content://" + ProviderManager.AUTHORITY + "/days/" + queryValue);
+		}
+		
+		// query the provider and capture returned cursor
+		Cursor cursorResult = getContentResolver().query(queryUri, null, null, null, null);		
+				
 		Log.i("RESULT", result);
 		// set the default value for all dates
 		int queryDay = 0;

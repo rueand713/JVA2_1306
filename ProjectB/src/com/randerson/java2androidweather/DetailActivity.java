@@ -69,6 +69,28 @@ public class DetailActivity extends Activity {
 	HashMap<String, Object> returnData;
 	
 	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		// TODO Auto-generated method stub
+		super.onSaveInstanceState(outState);
+		
+		// get the id of the currently selected radio buttons
+		int cityId = radios.getCheckedRadioButtonId();
+		int queryId = querys.getCheckedRadioButtonId();
+		
+		RadioButton cBtn = (RadioButton) findViewById(cityId);
+		RadioButton qBtn = (RadioButton) findViewById(queryId);
+		
+		Log.i("Saving IDs", "query: " + queryId + "city: " + cityId);
+		
+		if (cBtn != null && qBtn != null)
+		{
+			// store the radio key value pairs
+			outState.putInt("city", cityId);
+			outState.putInt("query", queryId);
+		}
+	}
+
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
@@ -92,7 +114,7 @@ public class DetailActivity extends Activity {
 		
 		// setup the alert toast object
 		alert = UIFactory.createToast("", false);
-		
+		 
 		// api request string parts
 		// the strings will be concatenated with the selected location and passed as the request
 		final String apiKey = getString(R.string.apikey);
@@ -182,6 +204,32 @@ public class DetailActivity extends Activity {
 				}
 			}
 		});
+		
+		// check whether or not there is saved state data
+		if (savedInstanceState != null)
+		{
+			int queryId = savedInstanceState.getInt("query");
+			int cityId = savedInstanceState.getInt("city");
+			
+			Log.i("Loading IDs", "query: " + queryId + "city: " + cityId);
+			
+			// check that the data is an actual id
+			if ( queryId > 0 && cityId > 0)
+			{
+				// create an instance of the radio buttons that are currently selected
+				RadioButton queryBtn = (RadioButton) querys.findViewById(queryId);
+				RadioButton cityBtn = (RadioButton) radios.findViewById(cityId);
+				
+				if (cityBtn != null && queryBtn != null)
+				{
+					
+					Log.i("Button setting", "Buttons are not null");
+					// set the radios to be selected
+					cityBtn.setChecked(true);
+					queryBtn.setChecked(true);
+				}
+			}
+		}
 	}
 
 	@Override
