@@ -16,6 +16,13 @@
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAlignment">center</item>
+        <item name="android:paddingTop">10dip</item>
+    </style>
+    
+    <style name="CurrentConditions">
+        <item name="android:textColor">@android:color/holo_orange_light</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">normal</item>
     </style>
     
     <style name="WeatherTitles">
@@ -24,7 +31,6 @@
         <item name="android:textStyle">normal</item>
         <item name="android:background">@android:color/holo_red_light</item>
         <item name="android:maxEms">5</item>
-        
     </style>
     
     <style name="WeatherInfo">
@@ -34,11 +40,21 @@
     </style>
     
     <style name="RadioStyle">
-        <item name="android:textColor">@android:color/darker_gray</item>
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:paddingLeft">2dip</item>
         <item name="android:paddingRight">5dip</item>
+        <item name="android:background">@android:color/white</item>
+        <item name="android:minWidth">240dip</item>
+    </style>
+    
+    <style name="RadioStyleB">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:paddingLeft">2dip</item>
+        <item name="android:paddingRight">5dip</item>
+        <item name="android:background">@android:color/darker_gray</item>
+        <item name="android:minWidth">240dip</item>
     </style>
     
     <style name="ImageStyle">

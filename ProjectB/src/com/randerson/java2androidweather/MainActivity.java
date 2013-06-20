@@ -43,8 +43,12 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-	// create a null textview object for the forecast title
+	// create a null textview objects for the forecast data
 	TextView headerText;
+	TextView currentCondition;
+	TextView temp;
+	TextView humidity;
+	TextView wind;
 	
 	// setup the listview
 	ListView list;
@@ -74,7 +78,13 @@ public class MainActivity extends Activity {
 		_context = this;
 		
 		// create the listview from layout file
-		list = (ListView) findViewById(R.id.list);
+		//list = (ListView) findViewById(R.id.list);
+		
+		// create the current condition text views from layout file
+		currentCondition = (TextView) findViewById(R.id.current_cond);
+		temp = (TextView) findViewById(R.id.current_temp);
+		wind = (TextView) findViewById(R.id.current_wind);
+		humidity = (TextView) findViewById(R.id.current_humid);
 		
 		// setup interface singleton
 		ifManager = new InterfaceManager(_context);
@@ -174,6 +184,8 @@ public class MainActivity extends Activity {
 	
 	public void handleResult(String result, Cursor cursorResult, String queryString)
 	{
+		
+		Log.i("RESULT", result);
 		// set the default value for all dates
 		int queryDay = 0;
 		
@@ -195,9 +207,6 @@ public class MainActivity extends Activity {
 		// show a toast to inform the user of current action
 		alert.setText("URL request complete");
 		alert.show();
-		
-		// log the result text
-		Log.i("RESPONSE", result);
 		
 		// create JSON objects from the result string
 		// that object is then queried for the particular key and the string is returned and set
@@ -241,8 +250,6 @@ public class MainActivity extends Activity {
 				
 				// put the value into the weather hashmap
 				thisCondition.put(keys[j-1], value);
-		
-				Log.i("Rows", value);
 			}
 			
 			// put the completed hashmap thisCondition into the weatherData hashmap 
@@ -253,11 +260,10 @@ public class MainActivity extends Activity {
 		}
 		
 		// set the detail view data
-		/*currentCondition.setText(condition);
-		humidity.setText(humidityf);
-		temp.setText(tempf);
-		windSpeed.setText(windSpeedm);
-		windDir.setText(windDirection);*/
+		currentCondition.setText(condition);
+		humidity.setText(humidityf + "%");
+		temp.setText(tempf + " F");
+		wind.setText(windSpeedm + " mph " + windDirection);
 		
 		// save the hash to internal storage
 		FileSystem.writeObjectFile(_context, weatherData, "history", false);
@@ -344,6 +350,8 @@ public class MainActivity extends Activity {
 	// method for populating the extended weather details
 	public void populateWeather(HashMap<String, HashMap<String, String>> hash, int targetDay)
 	{
+		
+		Log.i("POPULATE WEATHER", "method started");
 		// create a calendar object
 		Calendar cal = Calendar.getInstance();
 		
@@ -352,8 +360,6 @@ public class MainActivity extends Activity {
 		
 		// get the day values for the 5 day forecast
 		String[] week = returnNext5days(weekday);
-					
-		list.setVisibility(View.VISIBLE);
 		
 		// create a new hashmap list array
 		ArrayList<HashMap<String, String>> listArray = new ArrayList<HashMap<String, String>>();

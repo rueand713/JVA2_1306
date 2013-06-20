@@ -24,17 +24,24 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f080013;
-        public static final int cell_day1=0x7f08000d;
-        public static final int cell_day2=0x7f08000e;
-        public static final int cell_day3=0x7f08000f;
-        public static final int cell_day4=0x7f080010;
-        public static final int cell_day5=0x7f080011;
+        public static final int action_settings=0x7f08001b;
+        public static final int cell_day1=0x7f080015;
+        public static final int cell_day2=0x7f080016;
+        public static final int cell_day3=0x7f080017;
+        public static final int cell_day4=0x7f080018;
+        public static final int cell_day5=0x7f080019;
         public static final int condition=0x7f08000a;
+        public static final int condition_image=0x7f08000e;
+        public static final int current_cond=0x7f08000f;
+        public static final int current_humid=0x7f080011;
+        public static final int current_temp=0x7f080010;
+        public static final int current_weather=0x7f08000d;
+        public static final int current_wind=0x7f080012;
         public static final int day=0x7f080007;
-        public static final int forcastheader=0x7f08000c;
+        public static final int forcastheader=0x7f080013;
+        public static final int forecast_weather=0x7f080014;
         public static final int instructions=0x7f080002;
-        public static final int list=0x7f080012;
+        public static final int list=0x7f08001a;
         public static final int locales=0x7f080003;
         public static final int mainll=0x7f080000;
         public static final int querybtn=0x7f08000b;
@@ -43,6 +50,7 @@ public final class R {
         public static final int temp=0x7f080008;
         public static final int title=0x7f080001;
         public static final int weather_btn=0x7f080006;
+        public static final int weatherheader=0x7f08000c;
         public static final int wind=0x7f080009;
     }
     public static final class layout {
@@ -66,6 +74,7 @@ public final class R {
         public static final int day_field=0x7f050012;
         public static final int hello_world=0x7f050002;
         public static final int houston=0x7f050007;
+        public static final int humid=0x7f05000d;
         public static final int instructions=0x7f050003;
         public static final int logo=0x7f05000f;
         public static final int miami=0x7f050009;
@@ -81,9 +90,8 @@ public final class R {
         public static final int temp=0x7f05000c;
         public static final int temp_field=0x7f050013;
         public static final int titletext=0x7f050004;
+        public static final int wind=0x7f05000e;
         public static final int wind_field=0x7f050014;
-        public static final int windir=0x7f05000e;
-        public static final int winspd=0x7f05000d;
     }
     public static final class style {
         /** 
@@ -111,12 +119,14 @@ public final class R {
  All customizations that are NOT specific to a particular API-level can go here. 
          */
         public static final int AppTheme=0x7f060001;
-        public static final int CellStyle=0x7f060008;
-        public static final int ImageStyle=0x7f060006;
-        public static final int RadioStyle=0x7f060005;
-        public static final int TableStyle=0x7f060007;
+        public static final int CellStyle=0x7f06000a;
+        public static final int CurrentConditions=0x7f060003;
+        public static final int ImageStyle=0x7f060008;
+        public static final int RadioStyle=0x7f060006;
+        public static final int RadioStyleB=0x7f060007;
+        public static final int TableStyle=0x7f060009;
         public static final int Titles=0x7f060002;
-        public static final int WeatherInfo=0x7f060004;
-        public static final int WeatherTitles=0x7f060003;
+        public static final int WeatherInfo=0x7f060005;
+        public static final int WeatherTitles=0x7f060004;
     }
 }
