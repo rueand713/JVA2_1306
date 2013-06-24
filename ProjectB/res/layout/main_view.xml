@@ -19,10 +19,12 @@
          		android:textAlignment="center"
                 />
     
+    
     <Button android:id="@+id/querybtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/query_btn"/>
+        android:text="@string/query_btn"
+        />
     
     <TextView android:id="@+id/weatherheader" 
             	android:layout_width="wrap_content"

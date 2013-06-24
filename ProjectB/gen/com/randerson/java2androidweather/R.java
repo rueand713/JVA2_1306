@@ -24,22 +24,22 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f080024;
-        public static final int cell_day1=0x7f08001f;
-        public static final int cell_day2=0x7f080020;
-        public static final int cell_day3=0x7f080021;
-        public static final int cell_day4=0x7f080022;
-        public static final int cell_day5=0x7f080023;
-        public static final int condition=0x7f080014;
-        public static final int condition_image=0x7f080018;
-        public static final int current_cond=0x7f080019;
-        public static final int current_humid=0x7f08001b;
-        public static final int current_temp=0x7f08001a;
-        public static final int current_weather=0x7f080017;
-        public static final int current_wind=0x7f08001c;
-        public static final int day=0x7f080011;
-        public static final int forcastheader=0x7f08001d;
-        public static final int forecast_weather=0x7f08001e;
+        public static final int action_settings=0x7f080025;
+        public static final int cell_day1=0x7f080020;
+        public static final int cell_day2=0x7f080021;
+        public static final int cell_day3=0x7f080022;
+        public static final int cell_day4=0x7f080023;
+        public static final int cell_day5=0x7f080024;
+        public static final int condition=0x7f080015;
+        public static final int condition_image=0x7f080019;
+        public static final int current_cond=0x7f08001a;
+        public static final int current_humid=0x7f08001c;
+        public static final int current_temp=0x7f08001b;
+        public static final int current_weather=0x7f080018;
+        public static final int current_wind=0x7f08001d;
+        public static final int day=0x7f080012;
+        public static final int forcastheader=0x7f08001e;
+        public static final int forecast_weather=0x7f08001f;
         public static final int instructions=0x7f080002;
         public static final int l1=0x7f080004;
         public static final int l2=0x7f080005;
@@ -53,14 +53,15 @@ public final class R {
         public static final int q4=0x7f08000d;
         public static final int q5=0x7f08000e;
         public static final int q6=0x7f08000f;
-        public static final int querybtn=0x7f080015;
+        public static final int querybtn=0x7f080016;
         public static final int querychoice=0x7f080009;
         public static final int querydirection=0x7f080008;
-        public static final int temp=0x7f080012;
+        public static final int temp=0x7f080013;
         public static final int title=0x7f080001;
         public static final int weather_btn=0x7f080010;
-        public static final int weatherheader=0x7f080016;
-        public static final int wind=0x7f080013;
+        public static final int weatherheader=0x7f080017;
+        public static final int webbtn=0x7f080011;
+        public static final int wind=0x7f080014;
     }
     public static final class layout {
         public static final int details=0x7f030000;

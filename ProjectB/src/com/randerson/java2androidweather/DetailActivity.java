@@ -9,6 +9,7 @@ import com.randerson.java2androidweather.DetailService;
 import systemPack.FileSystem;
 import systemPack.IOManager;
 import systemPack.InterfaceManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -152,6 +153,29 @@ public class DetailActivity extends Activity {
 		
 		// creates the button with the UIFactory instance
 		Button sendBtn = (Button) findViewById(R.id.weather_btn);
+		Button webBtn = (Button) findViewById(R.id.webbtn);
+		
+		webBtn.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				// checks if there is a network connection
+				connected = IOManager.getConnectionStatus(_context);
+				
+				// call the method for displaying the toast
+				displayToast();
+				
+				if (connected)
+				{
+					String webUrl = "http://www.worldweatheronline.com/" + "CITY" + "-weather/" + "STATE" + "/US.aspx";
+					
+					Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(webUrl));
+					startActivity(webIntent);
+				}
+				
+			}
+		});
 		
 		// set up the on click for the send button
 		sendBtn.setOnClickListener(new View.OnClickListener() {
