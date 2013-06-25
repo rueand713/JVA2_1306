@@ -78,10 +78,9 @@ public class DetailActivity extends Activity {
 		int cityId = radios.getCheckedRadioButtonId();
 		int queryId = querys.getCheckedRadioButtonId();
 		
+		// create radio buttons references from the passed in ids
 		RadioButton cBtn = (RadioButton) findViewById(cityId);
 		RadioButton qBtn = (RadioButton) findViewById(queryId);
-		
-		Log.i("Saving IDs", "query: " + queryId + "city: " + cityId);
 		
 		if (cBtn != null && qBtn != null)
 		{
@@ -151,10 +150,11 @@ public class DetailActivity extends Activity {
 		// create the messenger object
 		intentMessenger = new Messenger(requestHandler);
 		
-		// creates the button with the UIFactory instance
+		// creates the button from layout file
 		Button sendBtn = (Button) findViewById(R.id.weather_btn);
 		Button webBtn = (Button) findViewById(R.id.webbtn);
 		
+		// set the click listener for the web button
 		webBtn.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -166,14 +166,62 @@ public class DetailActivity extends Activity {
 				// call the method for displaying the toast
 				displayToast();
 				
+				// get the id of the currently selected city radio button
+				int selectedId = radios.getCheckedRadioButtonId();
+				
+				// create an instance of the radio buttons that are currently selected
+				RadioButton rBtn = (RadioButton) findViewById(selectedId);
+				
 				if (connected)
 				{
-					String webUrl = "http://www.worldweatheronline.com/" + "CITY" + "-weather/" + "STATE" + "/US.aspx";
-					
-					Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(webUrl));
-					startActivity(webIntent);
+					if (rBtn != null)
+					{
+						// create strings with the city values from the string resource file
+						String houston = getString(R.string.houston);
+						String chicago = getString(R.string.chicago);
+						String seattle = getString(R.string.seattle);
+						String miami = getString(R.string.miami);
+						
+						// retrieve the selected button text value from the instance
+						String cityString = rBtn.getText().toString();
+						
+						// set the state null for string validation
+						String stateString = null;
+						
+						// compare the value of the city string with the resource strings
+						// set the state string when the city string matches the resource string
+						if (cityString.equals(houston))
+						{
+							stateString = "Texas";
+						}
+						else if (cityString.equals(chicago))
+						{
+							stateString = "Illinois";
+						}
+						else if (cityString.equals(seattle))
+						{
+							stateString = "Washington";
+						}
+						else if (cityString.equals(miami))
+						{
+							stateString = "Florida";
+						}
+						
+						// verify that the state string is created
+						if (stateString !=  null)
+						{
+							// set the web url string with the proper city and state values
+							String webUrl = "http://www.worldweatheronline.com/" + cityString + "-weather/" + stateString + "/US.aspx";
+							
+							// create the new system intent for opening a url
+							Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(webUrl));
+							
+							// start activity with the web intent
+							startActivity(webIntent);
+						}
+						
+					}
 				}
-				
 			}
 		});
 		
