@@ -43,19 +43,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
-
-	// create a null textview objects for the forecast data
-	TextView headerText;
-	TextView currentCondition;
-	TextView temp;
-	TextView humidity;
-	TextView wind;
-	
-	// setup the listview
-	//ListView list;
-	
-	// setup Image view
-	ImageView weatherView;
 	
 	// setup toast object
 	Toast alert;
@@ -71,6 +58,8 @@ public class MainActivity extends Activity {
 	
 	// save bundle
 	Bundle saveState;
+	
+	int contentView;
 		
 	// setup the memory hash object
 	HashMap<String, HashMap<String, String>> memHash;
@@ -79,32 +68,27 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main_view);
 		
+		
+		if (InterfaceManager.getOrientation(this) == InterfaceManager.LANDSCAPE)
+		{
+			contentView = R.layout.main_fragment1;
+		}
+		else if (InterfaceManager.getOrientation(this) == InterfaceManager.PORTRAIT)
+		{
+			contentView = R.layout.main_view;
+		}
+		
+		setContentView(contentView);
+		/*
 		// setting the current context
 		_context = this;
-		
-		// create the listview from layout file
-		//list = (ListView) findViewById(R.id.list);
-		
-		// create the image view from the layout file
-		weatherView = (ImageView) findViewById(R.id.condition_image);
-		
-		// create the current condition text views from layout file
-		currentCondition = (TextView) findViewById(R.id.current_cond);
-		temp = (TextView) findViewById(R.id.current_temp);
-		wind = (TextView) findViewById(R.id.current_wind);
-		humidity = (TextView) findViewById(R.id.current_humid);
 		
 		// setup interface singleton
 		ifManager = new InterfaceManager(_context);
 		
 		// create a toast from the singleton
 		alert = ifManager.createToast("", false);
-
-		// set the header textview text
-		headerText = (TextView) findViewById(R.id.forcastheader);
-		headerText.setText("Forecast");
 		
 		connected = IOManager.getConnectionStatus(_context);
 		
@@ -158,7 +142,7 @@ public class MainActivity extends Activity {
 				handleResult(result, query);
 			}
 		}
-		
+		*/
 	}
 
 	@Override
@@ -319,14 +303,14 @@ public class MainActivity extends Activity {
 		}
 		
 		// set the detail view data
-		currentCondition.setText(condition);
-		humidity.setText(humidityf + "%");
-		temp.setText(tempf + " F");
-		wind.setText(windSpeedm + " mph " + windDirection);
+		FragmentCurrentWeather.currentCondition.setText(condition);
+		FragmentCurrentWeather.humidity.setText(humidityf + "%");
+		FragmentCurrentWeather.temp.setText(tempf + " F");
+		FragmentCurrentWeather.wind.setText(windSpeedm + " mph " + windDirection);
 		
 		// ********** THE UrlImageViewHelper IS A THIRD PARTY ANDROID LIBRARY ***********
 		// download and set the weather condition image
-		UrlImageViewHelper.setUrlDrawable(weatherView, imageIcon);
+		UrlImageViewHelper.setUrlDrawable(FragmentCurrentWeather.weatherView, imageIcon);
 		
 		// save the hash to internal storage
 		FileSystem.writeObjectFile(_context, weatherData, "history", false);
@@ -335,7 +319,7 @@ public class MainActivity extends Activity {
 		if (weatherData != null)
 		{
 			// set the forecast header text
-			headerText.setText("Forecast");
+			FragmentForecast.headerText.setText("Forecast");
 			
 			// populate the weather data using the object file
 			populateWeather(weatherData, queryDay);

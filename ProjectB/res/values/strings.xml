@@ -32,5 +32,6 @@
     <string name="queryday5">5th day</string>
     <string name="queryall">All</string>
     <string name="query_btn">Query Options</string>
+    <string name="web_btn">View Weather</string>
     
 </resources>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+    
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    style="@style/AppBaseTheme"
+    >
+    
+    <TextView android:id="@+id/forcastheader" 
+            	android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/blank"
+                style="@style/Titles"
+                />
+        
+        <TableLayout android:id="@+id/forecast_weather"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TableStyle"
+            >
+            
+            <TableRow>
+            <TextView android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:minWidth="64dip"
+                android:text="@string/day_field"
+                style="@style/WeatherTitles"
+                />
+       
+             <TextView android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:minWidth="64dip"
+                android:text="@string/temp_field"
+                style="@style/WeatherTitles"
+                />
+             
+              <TextView android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:minWidth="64dip"
+                android:text="@string/wind_field"
+                style="@style/WeatherTitles"
+                />
+            
+               <TextView android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:minWidth="64dip"
+                android:text="@string/condition_field"
+                style="@style/WeatherTitles"
+                />
+               </TableRow>
+               
+            <TableRow 
+                android:layout_height="wrap_content"
+                android:id="@+id/cell_day1">
+            </TableRow>  
+            
+            <TableRow
+                android:layout_height="wrap_content"
+                android:id="@+id/cell_day2">
+            </TableRow>
+            
+            <TableRow
+                android:layout_height="wrap_content"
+                android:id="@+id/cell_day3">
+            </TableRow>
+            
+            <TableRow
+                android:layout_height="wrap_content"
+                android:id="@+id/cell_day4">
+            </TableRow>
+            
+            <TableRow
+                android:layout_height="wrap_content"
+                android:id="@+id/cell_day5">
+            </TableRow>
+              
+        </TableLayout>
+    
+</LinearLayout>
+</ScrollView>

@@ -219,7 +219,6 @@ public class DetailActivity extends Activity {
 							// start activity with the web intent
 							startActivity(webIntent);
 						}
-						
 					}
 				}
 			}

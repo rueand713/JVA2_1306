@@ -13,6 +13,7 @@ package systemPack;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,6 +26,10 @@ import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 
 public class InterfaceManager {
+	
+	public final static int LANDSCAPE = Configuration.ORIENTATION_LANDSCAPE;
+	public final static int PORTRAIT = Configuration.ORIENTATION_PORTRAIT;
+	
 
 	// class field for method context referencing
 	private Context _context;
@@ -41,6 +46,20 @@ public class InterfaceManager {
 		Intent thisIntent = new Intent(_context, activity);
 		
 		return thisIntent;
+	}
+	
+	// static method for retrieving orientation
+	public static int getOrientation(Context c)
+	{
+		// return the orienation value of the passed in context
+		return c.getResources().getConfiguration().orientation;
+	}
+	
+	// non-static method for retrieving orientation of the current context
+	public int getOrientation()
+	{
+		// return the orientation value of the current context
+		return _context.getResources().getConfiguration().orientation;
 	}
 	
 	// method for creating and returning a linear layout object

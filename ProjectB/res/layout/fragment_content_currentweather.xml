@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+<LinearLayout 
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    style="@style/AppBaseTheme"
+    >
+    
+    <TextView android:id="@+id/weatherheader" 
+            	android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/current"
+                android:paddingBottom="5dip"
+                style="@style/Titles"
+                />
+    
+    <TableLayout android:id="@+id/current_weather"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/TableStyle"
+        >
+        
+        <TableRow>
+            <TextView
+                android:text="@string/condition"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/CurrentConditions"
+                />
+        </TableRow>
+        
+        <TableRow>
+            <ImageView android:id="@+id/condition_image" 
+                android:contentDescription="@string/logo"
+                style="@style/ImageStyle"/>
+            
+            <TextView android:id="@+id/current_cond"
+                android:text="@string/blank"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="@android:color/white"
+                />    
+        </TableRow>
+        
+        <TableRow>
+            <TextView
+                android:text="@string/temp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="120dip"
+                style="@style/CurrentConditions"
+                />
+            
+            <TextView
+                android:text="@string/humid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="120dip"
+                style="@style/CurrentConditions"
+                />
+            
+            <TextView
+                android:text="@string/wind"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="120dip"
+                style="@style/CurrentConditions"
+                />
+            
+        </TableRow>
+        
+        <TableRow>
+            <TextView android:id="@+id/current_temp"
+                android:text="@string/blank"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="@android:color/white"
+                />
+            
+            <TextView android:id="@+id/current_humid"
+                android:text="@string/blank"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="@android:color/white"
+                />
+            
+            <TextView android:id="@+id/current_wind"
+                android:text="@string/blank"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="@android:color/white"
+                />
+            
+        </TableRow>
+    </TableLayout>
+</LinearLayout>
+</ScrollView>
