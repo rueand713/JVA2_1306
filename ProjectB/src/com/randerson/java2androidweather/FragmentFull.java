@@ -1,7 +1,9 @@
 package com.randerson.java2androidweather;
 
-import com.randerson.interfaces.FragmentParams;
 import systemPack.InterfaceManager;
+
+import com.randerson.interfaces.FragmentParams;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -12,24 +14,25 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class FragmentCurrentWeather extends Fragment {
-	
+public class FragmentFull extends Fragment {
+
 	// create a null textview objects for the forecast data
+	public TextView headerText;
 	public TextView currentCondition;
 	public TextView temp;
 	public TextView humidity;
 	public TextView wind;
 	
-	public static View view;
+	// create the UI singleton
+	InterfaceManager ifManager;
 	
+	public static View view;
+		
 	// setup Image view
 	public ImageView weatherView;
 	
 	private FragmentParams parentActivity;
 	
-	// create the UI singleton
-	InterfaceManager ifManager;
-
 	@Override
 	public void onAttach(Activity activity) {
 		// TODO Auto-generated method stub
@@ -38,18 +41,23 @@ public class FragmentCurrentWeather extends Fragment {
 		if (activity instanceof FragmentParams)
 		{
 			parentActivity = (FragmentParams) activity;
+		
 		}
 		else
 		{
 			throw new ClassCastException(activity.toString() + " must implement required methods");
 		}
 	}
-
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		view = inflater.inflate(R.layout.fragment_content_currentweather, container);
+		view = inflater.inflate(R.layout.fragment_content_full, container);
+		
+		// set the header textview text
+		headerText = (TextView) view.findViewById(R.id.forcastheader);
+		headerText.setText("Forecast");
 		
 		// create the image view from the layout file
 		weatherView = (ImageView) view.findViewById(R.id.condition_image);
@@ -75,6 +83,7 @@ public class FragmentCurrentWeather extends Fragment {
 		});
 		
 		parentActivity.getWeatherView(view);
+		parentActivity.receiveTableView(view);
 		
 		return view;
 	}

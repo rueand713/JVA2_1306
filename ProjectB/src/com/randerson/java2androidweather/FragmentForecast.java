@@ -1,7 +1,6 @@
 package com.randerson.java2androidweather;
 
 import com.randerson.interfaces.FragmentParams;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -10,13 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class FragmentForecast extends Fragment{
+public class FragmentForecast extends Fragment {
 	
 	// create a null textview objects for the forecast data
-	public static TextView headerText;
+	public TextView headerText;
 	
 	// the current view object
-	View view;
+	public static View view;
 	
 	private FragmentParams parentActivity;
 
@@ -28,8 +27,6 @@ public class FragmentForecast extends Fragment{
 		if (activity instanceof FragmentParams)
 		{
 			parentActivity = (FragmentParams) activity;
-			
-			parentActivity.receiveTableView(view);
 		}
 		else
 		{
@@ -47,8 +44,9 @@ public class FragmentForecast extends Fragment{
 		headerText = (TextView) view.findViewById(R.id.forcastheader);
 		headerText.setText("Forecast");
 		
+		parentActivity.receiveTableView(view);
+		
 		return view;
-	}
-	
+	}	
 	
 }

@@ -63,8 +63,8 @@ public class MainActivity extends Activity implements FragmentParams {
 	View currentWeatherFragment;
 	View forecastFragment;
 	
-	// the layout id for the view in context
-	int contentView;
+	// orientation id
+	int fragView;
 		
 	// setup the memory hash object
 	HashMap<String, HashMap<String, String>> memHash;
@@ -74,18 +74,21 @@ public class MainActivity extends Activity implements FragmentParams {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		fragView = InterfaceManager.getOrientation(this);
+		
 		// check the orientation state and load the appropriate layout id
-		if (InterfaceManager.getOrientation(this) == InterfaceManager.LANDSCAPE)
+		if ( fragView == InterfaceManager.LANDSCAPE)
 		{
-			contentView = R.layout.main_fragment1;
+			// set the content view
+			setContentView(R.layout.main_fragment1);
 		}
-		else if (InterfaceManager.getOrientation(this) == InterfaceManager.PORTRAIT)
+		else if (fragView == InterfaceManager.PORTRAIT)
 		{
-			contentView = R.layout.main_view;
+			// set the content view
+			setContentView(R.layout.main_view);
 		}
 		
-		// set the content view
-		setContentView(contentView);
+		saveState = savedInstanceState;
 		
 		// setting the current context
 		_context = this;
@@ -138,26 +141,38 @@ public class MainActivity extends Activity implements FragmentParams {
 			}
 		});*/
 		
-		// check if there is saved data
-		if (savedInstanceState != null)
-		{
-			// create string objects from the stored data
-			String result = savedInstanceState.getString("result");
-			String query = savedInstanceState.getString("query");
-			
-			// pass in the stored data strings to repopulate the views
-			if (result != null && query != null)
-			{
-				handleResult(result, query);
-			}
-		}
 		
-	}
-
-	@Override
-	protected void onPause() {
-		// TODO Auto-generated method stub
-		super.onPause();
+		// check if there is saved data
+				if (saveState != null)
+				{	
+					// create string objects from the stored data
+					String result = saveState.getString("result");
+					String query = saveState.getString("query");
+					
+					// pass in the stored data strings to repopulate the views
+					if (result != null && query != null)
+					{
+						if (currentWeatherFragment == null && forecastFragment == null)
+						{
+							fragView = InterfaceManager.getOrientation(this);
+							
+							// check the orientation state and load the appropriate layout id
+							if (fragView == InterfaceManager.LANDSCAPE)
+							{
+								currentWeatherFragment = FragmentCurrentWeather.view;
+								forecastFragment = FragmentForecast.view;
+							}
+							else if (fragView == InterfaceManager.PORTRAIT)
+							{
+								currentWeatherFragment = FragmentFull.view;
+								forecastFragment = FragmentFull.view;
+							}
+						}
+						
+						handleResult(result, query);
+						Log.i("onSaveInstanceState", "Data state loaded");
+					}
+				}
 	}
 
 	@Override
@@ -311,35 +326,41 @@ public class MainActivity extends Activity implements FragmentParams {
 			cursorResult.moveToNext();
 		}
 		
-		// create the current condition text views from layout file
-		TextView currentCondition = (TextView) currentWeatherFragment.findViewById(R.id.current_cond);
-		TextView temp = (TextView) currentWeatherFragment.findViewById(R.id.current_temp);
-		TextView wind = (TextView) currentWeatherFragment.findViewById(R.id.current_wind);
-		TextView humidity = (TextView) currentWeatherFragment.findViewById(R.id.current_humid);
+		Log.i("Views", "setting text view data");
 		
-		// set the detail view data
-		currentCondition.setText(condition);
-		humidity.setText(humidityf + "%");
-		temp.setText(tempf + " F");
-		wind.setText(windSpeedm + " mph " + windDirection);
-		
-		// create the image view from the layout file
-		ImageView weatherView = (ImageView) currentWeatherFragment.findViewById(R.id.condition_image);
-		
-		// ********** THE UrlImageViewHelper IS A THIRD PARTY ANDROID LIBRARY ***********
-		// download and set the weather condition image
-		UrlImageViewHelper.setUrlDrawable(weatherView, imageIcon);
-		
-		// save the hash to internal storage
-		FileSystem.writeObjectFile(_context, weatherData, "history", false);
-		
-		// verify that the weatherData is created properly
-		if (weatherData != null)
+		if (currentWeatherFragment != null && forecastFragment != null)
 		{
+			// create the current condition text views from layout file
+			TextView currentCondition = (TextView) currentWeatherFragment.findViewById(R.id.current_cond);
+			TextView temp = (TextView) currentWeatherFragment.findViewById(R.id.current_temp);
+			TextView wind = (TextView) currentWeatherFragment.findViewById(R.id.current_wind);
+			TextView humidity = (TextView) currentWeatherFragment.findViewById(R.id.current_humid);
 			TextView forecastText = (TextView) forecastFragment.findViewById(R.id.forcastheader);
 			
 			// set the forecast header text
 			forecastText.setText("Forecast");
+			
+			Log.i("Views", "set forecast header");
+			
+			// set the detail view data
+			currentCondition.setText(condition);
+			humidity.setText(humidityf + "%");
+			temp.setText(tempf + " F");
+			wind.setText(windSpeedm + " mph " + windDirection);
+			
+			Log.i("Views", "loading image view");
+			// create the image view from the layout file
+			ImageView weatherView = (ImageView) currentWeatherFragment.findViewById(R.id.condition_image);
+			
+			// ********** THE UrlImageViewHelper IS A THIRD PARTY ANDROID LIBRARY ***********
+			// download and set the weather condition image
+			UrlImageViewHelper.setUrlDrawable(weatherView, imageIcon);
+		}
+		// verify that the weatherData is created properly
+		if (weatherData != null)
+		{	
+			// save the hash to internal storage
+			FileSystem.writeObjectFile(_context, weatherData, "history", false);
 			
 			// populate the weather data using the object file
 			populateWeather(weatherData, queryDay);
@@ -540,13 +561,13 @@ public class MainActivity extends Activity implements FragmentParams {
 	}
 
 	@Override
-	public void getFragmentParams(Intent intent, View v) {
+	public void startResultActivity() {
 		
-		// set the current weather fragment view
-		currentWeatherFragment = v;
+		// make an intent for the detailActivity
+		Intent detailIntent = ifManager.makeIntent(DetailActivity.class);
 		
 		// start the querying activity
-		startActivityForResult(intent, 0);
+		startActivityForResult(detailIntent, 0);
 	}
 
 	@Override
@@ -554,6 +575,13 @@ public class MainActivity extends Activity implements FragmentParams {
 		
 		// set the forecast weather view
 		forecastFragment = v;
+	}
+	
+	@Override
+	public void getWeatherView(View v)
+	{
+		// set the current weather fragment view
+		currentWeatherFragment = v;
 	}
 
 }
