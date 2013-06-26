@@ -25,6 +25,7 @@ import systemPack.ProviderManager;
 import systemPack.ProviderManager.ProviderData;
 
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
+import com.randerson.interfaces.FragmentParams;
 import com.randerson.java2androidweather.R;
 
 import android.net.Uri;
@@ -36,13 +37,12 @@ import android.database.Cursor;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements FragmentParams {
 	
 	// setup toast object
 	Toast alert;
@@ -59,6 +59,11 @@ public class MainActivity extends Activity {
 	// save bundle
 	Bundle saveState;
 	
+	// fragment views
+	View currentWeatherFragment;
+	View forecastFragment;
+	
+	// the layout id for the view in context
 	int contentView;
 		
 	// setup the memory hash object
@@ -69,7 +74,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		
+		// check the orientation state and load the appropriate layout id
 		if (InterfaceManager.getOrientation(this) == InterfaceManager.LANDSCAPE)
 		{
 			contentView = R.layout.main_fragment1;
@@ -79,8 +84,9 @@ public class MainActivity extends Activity {
 			contentView = R.layout.main_view;
 		}
 		
+		// set the content view
 		setContentView(contentView);
-		/*
+		
 		// setting the current context
 		_context = this;
 		
@@ -103,8 +109,10 @@ public class MainActivity extends Activity {
 				// populate the weather data using the object file
 				populateWeather(memHash, -1);
 				
+				TextView forecastText = (TextView) forecastFragment.findViewById(R.id.forcastheader);
+				
 				// set the forecast header text
-				headerText.setText("Forecast (cached)");
+				forecastText.setText("Forecast (cached)");
 				
 				// show a toast to inform the user of current action
 				alert.setText("Loaded saved weather data");
@@ -112,6 +120,7 @@ public class MainActivity extends Activity {
 			}
 		}
 		
+		/*
 		// create button object reference to layout
 		Button queryBtn = (Button) findViewById(R.id.querybtn);
 		
@@ -127,7 +136,7 @@ public class MainActivity extends Activity {
 				// start the next activity for returning a value
 				startActivityForResult(detailIntent, 0);
 			}
-		});
+		});*/
 		
 		// check if there is saved data
 		if (savedInstanceState != null)
@@ -142,7 +151,7 @@ public class MainActivity extends Activity {
 				handleResult(result, query);
 			}
 		}
-		*/
+		
 	}
 
 	@Override
@@ -302,15 +311,24 @@ public class MainActivity extends Activity {
 			cursorResult.moveToNext();
 		}
 		
+		// create the current condition text views from layout file
+		TextView currentCondition = (TextView) currentWeatherFragment.findViewById(R.id.current_cond);
+		TextView temp = (TextView) currentWeatherFragment.findViewById(R.id.current_temp);
+		TextView wind = (TextView) currentWeatherFragment.findViewById(R.id.current_wind);
+		TextView humidity = (TextView) currentWeatherFragment.findViewById(R.id.current_humid);
+		
 		// set the detail view data
-		FragmentCurrentWeather.currentCondition.setText(condition);
-		FragmentCurrentWeather.humidity.setText(humidityf + "%");
-		FragmentCurrentWeather.temp.setText(tempf + " F");
-		FragmentCurrentWeather.wind.setText(windSpeedm + " mph " + windDirection);
+		currentCondition.setText(condition);
+		humidity.setText(humidityf + "%");
+		temp.setText(tempf + " F");
+		wind.setText(windSpeedm + " mph " + windDirection);
+		
+		// create the image view from the layout file
+		ImageView weatherView = (ImageView) currentWeatherFragment.findViewById(R.id.condition_image);
 		
 		// ********** THE UrlImageViewHelper IS A THIRD PARTY ANDROID LIBRARY ***********
 		// download and set the weather condition image
-		UrlImageViewHelper.setUrlDrawable(FragmentCurrentWeather.weatherView, imageIcon);
+		UrlImageViewHelper.setUrlDrawable(weatherView, imageIcon);
 		
 		// save the hash to internal storage
 		FileSystem.writeObjectFile(_context, weatherData, "history", false);
@@ -318,8 +336,10 @@ public class MainActivity extends Activity {
 		// verify that the weatherData is created properly
 		if (weatherData != null)
 		{
+			TextView forecastText = (TextView) forecastFragment.findViewById(R.id.forcastheader);
+			
 			// set the forecast header text
-			FragmentForecast.headerText.setText("Forecast");
+			forecastText.setText("Forecast");
 			
 			// populate the weather data using the object file
 			populateWeather(weatherData, queryDay);
@@ -434,11 +454,11 @@ public class MainActivity extends Activity {
 		}
 		
 		// create the table row objects from the layout
-		TableRow row1 = (TableRow) findViewById(R.id.cell_day1);
-		TableRow row2 = (TableRow) findViewById(R.id.cell_day2);
-		TableRow row3 = (TableRow) findViewById(R.id.cell_day3);
-		TableRow row4 = (TableRow) findViewById(R.id.cell_day4);
-		TableRow row5 = (TableRow) findViewById(R.id.cell_day5);
+		TableRow row1 = (TableRow) forecastFragment.findViewById(R.id.cell_day1);
+		TableRow row2 = (TableRow) forecastFragment.findViewById(R.id.cell_day2);
+		TableRow row3 = (TableRow) forecastFragment.findViewById(R.id.cell_day3);
+		TableRow row4 = (TableRow) forecastFragment.findViewById(R.id.cell_day4);
+		TableRow row5 = (TableRow) forecastFragment.findViewById(R.id.cell_day5);
 		
 		// remove any children in the rows
 		row1.removeAllViews();
@@ -517,6 +537,23 @@ public class MainActivity extends Activity {
 		
 		// set the list view adapter
 		//list.setAdapter(listAdapter);
+	}
+
+	@Override
+	public void getFragmentParams(Intent intent, View v) {
+		
+		// set the current weather fragment view
+		currentWeatherFragment = v;
+		
+		// start the querying activity
+		startActivityForResult(intent, 0);
+	}
+
+	@Override
+	public void receiveTableView(View v) {
+		
+		// set the forecast weather view
+		forecastFragment = v;
 	}
 
 }

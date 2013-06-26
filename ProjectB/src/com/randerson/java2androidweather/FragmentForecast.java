@@ -1,5 +1,7 @@
 package com.randerson.java2androidweather;
 
+import com.randerson.interfaces.FragmentParams;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -12,24 +14,40 @@ public class FragmentForecast extends Fragment{
 	
 	// create a null textview objects for the forecast data
 	public static TextView headerText;
+	
+	// the current view object
+	View view;
+	
+	private FragmentParams parentActivity;
 
 	@Override
 	public void onAttach(Activity activity) {
 		// TODO Auto-generated method stub
 		super.onAttach(activity);
+		
+		if (activity instanceof FragmentParams)
+		{
+			parentActivity = (FragmentParams) activity;
+			
+			parentActivity.receiveTableView(view);
+		}
+		else
+		{
+			throw new ClassCastException(activity.toString() + " must implement required methods");
+		}
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		View v = inflater.inflate(R.layout.fragment_content_forecastweather, container);
+		view = inflater.inflate(R.layout.fragment_content_forecastweather, container);
 		
 		// set the header textview text
-		headerText = (TextView) v.findViewById(R.id.forcastheader);
+		headerText = (TextView) view.findViewById(R.id.forcastheader);
 		headerText.setText("Forecast");
 		
-		return v;
+		return view;
 	}
 	
 	

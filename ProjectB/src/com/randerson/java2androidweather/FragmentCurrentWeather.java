@@ -1,6 +1,6 @@
 package com.randerson.java2androidweather;
 
-import com.randerson.interfaces.DoQuery;
+import com.randerson.interfaces.FragmentParams;
 
 import systemPack.InterfaceManager;
 import android.app.Activity;
@@ -22,10 +22,12 @@ public class FragmentCurrentWeather extends Fragment {
 	public static TextView humidity;
 	public static TextView wind;
 	
+	private View view;
+	
 	// setup Image view
 	public static ImageView weatherView;
 	
-	private DoQuery parentActivity;
+	private FragmentParams parentActivity;
 	
 	// create the UI singleton
 	InterfaceManager ifManager;
@@ -35,9 +37,9 @@ public class FragmentCurrentWeather extends Fragment {
 		// TODO Auto-generated method stub
 		super.onAttach(activity);
 		
-		if (activity instanceof DoQuery)
+		if (activity instanceof FragmentParams)
 		{
-			parentActivity = (DoQuery) activity;
+			parentActivity = (FragmentParams) activity;
 		}
 		else
 		{
@@ -49,19 +51,19 @@ public class FragmentCurrentWeather extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		View v = inflater.inflate(R.layout.fragment_content_currentweather, container);
+		view = inflater.inflate(R.layout.fragment_content_currentweather, container);
 		
 		// create the image view from the layout file
-		weatherView = (ImageView) v.findViewById(R.id.condition_image);
+		weatherView = (ImageView) view.findViewById(R.id.condition_image);
 		
 		// create the current condition text views from layout file
-		currentCondition = (TextView) v.findViewById(R.id.current_cond);
-		temp = (TextView) v.findViewById(R.id.current_temp);
-		wind = (TextView) v.findViewById(R.id.current_wind);
-		humidity = (TextView) v.findViewById(R.id.current_humid);
+		currentCondition = (TextView) view.findViewById(R.id.current_cond);
+		temp = (TextView) view.findViewById(R.id.current_temp);
+		wind = (TextView) view.findViewById(R.id.current_wind);
+		humidity = (TextView) view.findViewById(R.id.current_humid);
 		
 		// create button object reference to layout
-		Button queryBtn = (Button) v.findViewById(R.id.querybtn);
+		Button queryBtn = (Button) view.findViewById(R.id.querybtn);
 		
 		// set the button click functionality
 		queryBtn.setOnClickListener(new View.OnClickListener() {
@@ -73,11 +75,11 @@ public class FragmentCurrentWeather extends Fragment {
 				Intent detailIntent = ifManager.makeIntent(DetailActivity.class);
 				
 				// start the next activity for returning a value
-				parentActivity.returnQueryResults(detailIntent);
+				parentActivity.getFragmentParams(detailIntent, view);
 			}
 		});
 		
-		return v;
+		return view;
 	}
 
 	
