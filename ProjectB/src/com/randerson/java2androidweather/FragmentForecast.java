@@ -44,6 +44,7 @@ public class FragmentForecast extends Fragment {
 		headerText = (TextView) view.findViewById(R.id.forcastheader);
 		headerText.setText("Forecast");
 		
+		// pass the view into the parent
 		parentActivity.receiveTableView(view);
 		
 		return view;

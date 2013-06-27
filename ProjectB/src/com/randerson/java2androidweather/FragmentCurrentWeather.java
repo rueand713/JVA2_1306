@@ -70,10 +70,11 @@ public class FragmentCurrentWeather extends Fragment {
 			public void onClick(View v) {
 				
 				// start the next activity for returning a value
-				parentActivity.startResultActivity();
+				parentActivity.changeFragmentView("true");
 			}
 		});
 		
+		// pass the view into the parent
 		parentActivity.getWeatherView(view);
 		
 		return view;

@@ -30,7 +30,12 @@ import com.randerson.java2androidweather.R;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Messenger;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -42,6 +47,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+@SuppressLint("HandlerLeak")
 public class MainActivity extends Activity implements FragmentParams {
 	
 	// setup toast object
@@ -63,32 +69,58 @@ public class MainActivity extends Activity implements FragmentParams {
 	View currentWeatherFragment;
 	View forecastFragment;
 	
+	// set the handler and messenger objects
+	Handler requestHandler;
+	Messenger intentMessenger;
+	
 	// orientation id
 	int fragView;
 		
 	// setup the memory hash object
 	HashMap<String, HashMap<String, String>> memHash;
 	
+	// object array for return data
+	HashMap<String, Object> returnData;
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		saveState = savedInstanceState;
 		fragView = InterfaceManager.getOrientation(this);
 		
 		// check the orientation state and load the appropriate layout id
-		if ( fragView == InterfaceManager.LANDSCAPE)
+		if (fragView == InterfaceManager.LANDSCAPE)
 		{
-			// set the content view
-			setContentView(R.layout.main_fragment1);
+			if (saveState != null)
+			{
+				if (saveState.getString("show_query") != null && saveState.getString("show_query").equals("true"))
+				{
+					// set the content view
+					setContentView(R.layout.main_fragment2);
+				}
+				else
+				{
+					// set the content view
+					setContentView(R.layout.main_fragment1);
+				}
+			}
+			
 		}
 		else if (fragView == InterfaceManager.PORTRAIT)
 		{
 			// set the content view
 			setContentView(R.layout.main_view);
+			
+			if (saveState != null)
+			{
+				if (saveState.getString("show_query") != null && saveState.getString("show_query").equals("true"))
+				{
+					saveState.putString("show_query", "false");
+				}
+			}
 		}
-		
-		saveState = savedInstanceState;
 		
 		// setting the current context
 		_context = this;
@@ -123,56 +155,37 @@ public class MainActivity extends Activity implements FragmentParams {
 			}
 		}
 		
-		/*
-		// create button object reference to layout
-		Button queryBtn = (Button) findViewById(R.id.querybtn);
-		
-		// set the button click functionality
-		queryBtn.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				
-				// make an intent for the detailActivity
-				Intent detailIntent = ifManager.makeIntent(DetailActivity.class);
-				
-				// start the next activity for returning a value
-				startActivityForResult(detailIntent, 0);
-			}
-		});*/
-		
-		
 		// check if there is saved data
-				if (saveState != null)
-				{	
-					// create string objects from the stored data
-					String result = saveState.getString("result");
-					String query = saveState.getString("query");
+		if (saveState != null)
+		{	
+			// create string objects from the stored data
+			String result = saveState.getString("result");
+			String query = saveState.getString("query");
+			
+			// pass in the stored data strings to repopulate the views
+			if (result != null && query != null)
+			{
+				if (currentWeatherFragment == null && forecastFragment == null)
+				{
+					fragView = InterfaceManager.getOrientation(this);
 					
-					// pass in the stored data strings to repopulate the views
-					if (result != null && query != null)
+					// check the orientation state and load the appropriate layout id
+					if (fragView == InterfaceManager.LANDSCAPE)
 					{
-						if (currentWeatherFragment == null && forecastFragment == null)
-						{
-							fragView = InterfaceManager.getOrientation(this);
-							
-							// check the orientation state and load the appropriate layout id
-							if (fragView == InterfaceManager.LANDSCAPE)
-							{
-								currentWeatherFragment = FragmentCurrentWeather.view;
-								forecastFragment = FragmentForecast.view;
-							}
-							else if (fragView == InterfaceManager.PORTRAIT)
-							{
-								currentWeatherFragment = FragmentFull.view;
-								forecastFragment = FragmentFull.view;
-							}
-						}
-						
-						handleResult(result, query);
-						Log.i("onSaveInstanceState", "Data state loaded");
+						currentWeatherFragment = FragmentCurrentWeather.view;
+						forecastFragment = FragmentForecast.view;
+					}
+					else if (fragView == InterfaceManager.PORTRAIT)
+					{
+						currentWeatherFragment = FragmentFull.view;
+						forecastFragment = FragmentFull.view;
 					}
 				}
+				
+				handleResult(result, query);
+				Log.i("onSaveInstanceState", "Data state loaded");
+			}
+		}
 	}
 
 	@Override
@@ -182,8 +195,10 @@ public class MainActivity extends Activity implements FragmentParams {
 		
 		if (saveState != null)
 		{
+			// save out the instance data
 			outState.putString("result", saveState.getString("result"));
 			outState.putString("query", saveState.getString("query"));
+			outState.putString("show_query", saveState.getString("show_query"));
 		}
 		
 		Log.i("onSaveInstanceState", "Data state saved");
@@ -522,12 +537,16 @@ public class MainActivity extends Activity implements FragmentParams {
 			
 			// add cell styling
 			day.setPadding(0, 5, 20, 1);
+			day.setLines(2);
 			day.setBackgroundColor(cellColor);
 			temp.setPadding(0, 5, 20, 1);
+			temp.setLines(2);
 			temp.setBackgroundColor(cellColor);
 			wind.setPadding(0, 5, 20, 1);
+			wind.setLines(2);
 			wind.setBackgroundColor(cellColor);
 			cond.setPadding(0, 5, 20, 1);
+			cond.setLines(2);
 			cond.setBackgroundColor(cellColor);
 			
 			// set the actual day value for the weather forecast
@@ -561,13 +580,59 @@ public class MainActivity extends Activity implements FragmentParams {
 	}
 
 	@Override
-	public void startResultActivity() {
+	public void startResultActivity(Intent intent) {
 		
-		// make an intent for the detailActivity
-		Intent detailIntent = ifManager.makeIntent(DetailActivity.class);
-		
-		// start the querying activity
-		startActivityForResult(detailIntent, 0);
+		// check if the intent is null 
+		// null intent argument signals to open a second activity
+		// otherwise the second fragment should be inflated with the second activity layout
+		if (intent == null)
+		{
+			// create the intent for the detail activity
+			Intent detailIntent = ifManager.makeIntent(DetailActivity.class);
+			
+			// start the querying activity
+			startActivityForResult(detailIntent, 0);
+		}
+		else
+		{
+			final String intentQuery = intent.getExtras().getString("query");
+			
+			// the request handler object recieves the message from the service, writes the message to file storage
+			requestHandler = new Handler() 
+			{	
+				@Override
+				public void handleMessage(Message msg) {
+					// TODO Auto-generated method stub
+					super.handleMessage(msg);
+					
+					if (msg.arg1 == RESULT_OK && msg.obj != null)
+					{
+						// save the JSON string to the device
+						FileSystem.writeObjectFile(_context, msg.obj, "JsonWeather", false);
+						
+						String result = (String) msg.obj;
+						String query = intentQuery;
+						
+						// create the savestate bundle
+						saveState = new Bundle();
+			
+						saveState.putString("result", result);
+						saveState.putString("query", query);
+						
+						changeFragmentView("false");
+					}
+				}
+			};
+			
+			// create the messenger object
+			intentMessenger = new Messenger(requestHandler);
+			
+			// put the messenger into the intent
+			intent.putExtra("Messenger", intentMessenger);
+			
+			// start up the service
+			startService(intent);
+		}
 	}
 
 	@Override
@@ -583,5 +648,29 @@ public class MainActivity extends Activity implements FragmentParams {
 		// set the current weather fragment view
 		currentWeatherFragment = v;
 	}
+
+	@Override
+	public void changeFragmentView(String bool) {
+		
+		if (saveState != null)
+		{
+			// set the content view params for showing the proper xml layout
+			saveState.putString("show_query", bool);
+		}
+		
+		// recreate the views
+		this.recreate();
+		
+	}
+	
+	// method for retrieving a fragment
+	public Fragment getFragment(int id)
+	{
+		Fragment fragment =  getFragmentManager().findFragmentById(id);
+		
+		return fragment;
+	}
+	
+	
 
 }

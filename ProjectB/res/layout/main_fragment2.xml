@@ -16,8 +16,8 @@
          />
     
     <fragment
-        android:id="@+id/fragment_main2"
-        android:name="com.randerson.java2androidweather.FragmentForecast"
+        android:id="@+id/fragment_main3"
+        android:name="com.randerson.java2androidweather.FragmentDetails"
         android:layout_width="0dp"
         android:layout_height="wrap_content" 
         android:layout_weight="2"

@@ -54,14 +54,17 @@
             <ImageView android:id="@+id/condition_image" 
                 android:contentDescription="@string/logo"
                 style="@style/ImageStyle"/>
-            
+               
+        </TableRow>
+        
+        <TableRow>
             <TextView android:id="@+id/current_cond"
                 android:text="@string/blank"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:textColor="@android:color/white"
-                />    
+                /> 
         </TableRow>
         
         <TableRow>
@@ -70,25 +73,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minWidth="120dip"
+                android:paddingTop="10dip"
                 style="@style/CurrentConditions"
                 />
-            
-            <TextView
-                android:text="@string/humid"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minWidth="120dip"
-                style="@style/CurrentConditions"
-                />
-            
-            <TextView
-                android:text="@string/wind"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minWidth="120dip"
-                style="@style/CurrentConditions"
-                />
-            
+             
         </TableRow>
         
         <TableRow>
@@ -99,7 +87,21 @@
                 android:textSize="20sp"
                 android:textColor="@android:color/white"
                 />
-            
+  
+        </TableRow>
+        
+        <TableRow>
+            <TextView
+                android:text="@string/humid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="120dip"
+                android:paddingTop="10dip"
+                style="@style/CurrentConditions"
+                />
+        </TableRow>
+        
+        <TableRow>
             <TextView android:id="@+id/current_humid"
                 android:text="@string/blank"
                 android:layout_width="match_parent"
@@ -107,6 +109,21 @@
                 android:textSize="20sp"
                 android:textColor="@android:color/white"
                 />
+        </TableRow>
+        
+        <TableRow>
+            
+            <TextView
+                android:text="@string/wind"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="120dip"
+                android:paddingTop="10dip"
+                style="@style/CurrentConditions"
+                />
+        </TableRow>
+        
+        <TableRow>
             
             <TextView android:id="@+id/current_wind"
                 android:text="@string/blank"
@@ -114,8 +131,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:textColor="@android:color/white"
-                />
-            
+                />  
         </TableRow>
     </TableLayout>
 </LinearLayout>

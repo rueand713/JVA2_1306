@@ -78,10 +78,11 @@ public class FragmentFull extends Fragment {
 			public void onClick(View v) {
 				
 				// start the next activity for returning a value
-				parentActivity.startResultActivity();
+				parentActivity.startResultActivity(null);
 			}
 		});
 		
+		// pass in the view to the parent
 		parentActivity.getWeatherView(view);
 		parentActivity.receiveTableView(view);
 		

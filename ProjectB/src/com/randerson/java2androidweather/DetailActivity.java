@@ -30,9 +30,9 @@ import android.widget.Toast;
 public class DetailActivity extends Activity {
 
 	// token identifiers for the service class
-		public static final String MESSENGER_KEY = "Messenger";
-		public static final String URL_KEY = "Url";
-		public static final String JSON_SAVE_FILE = "JsonWeather";
+	public static final String MESSENGER_KEY = "Messenger";
+	public static final String URL_KEY = "Url";
+	public static final String JSON_SAVE_FILE = "JsonWeather";
 		
 	// instantiate the InterfaceManager singleton
 	InterfaceManager UIFactory;

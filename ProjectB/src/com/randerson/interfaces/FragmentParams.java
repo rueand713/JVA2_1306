@@ -1,5 +1,6 @@
 package com.randerson.interfaces;
 
+import android.content.Intent;
 import android.view.View;
 
 public interface FragmentParams {
@@ -11,5 +12,8 @@ public interface FragmentParams {
 	void receiveTableView(View v);
 	
 	// method for starting the intent in parent activity
-	void startResultActivity();
+	void startResultActivity(Intent intent);
+	
+	// method for updating the second landscape fragment
+	void changeFragmentView(String bool);
 }
