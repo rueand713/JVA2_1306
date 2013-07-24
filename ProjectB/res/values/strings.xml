@@ -33,5 +33,8 @@
     <string name="queryall">All</string>
     <string name="query_btn">Query Options</string>
     <string name="web_btn">View Weather</string>
+    <string name="zip_directions">Enter your five digit zip code for weather updates.</string>
+    <string name="zip_hint">Zip Code</string>
+    <string name="zip_button">Done</string>
     
 </resources>
