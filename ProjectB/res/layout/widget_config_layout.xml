@@ -13,6 +13,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/zip_hint"
+        android:textColor="@android:color/white"
+        android:inputType="number"
+        android:maxLength="5"
         />
     
     <Button android:id="@+id/zip_accept" 

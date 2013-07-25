@@ -16,18 +16,26 @@
 	        android:layout_height="wrap_content"
 	        android:orientation="vertical">
 	        
-	        <TextView android:id="@+id/widget_temp_hi"
+	        <TextView android:id="@+id/widget_humidity"
 	       		android:layout_width="wrap_content"
 	       		android:layout_height="wrap_content"
 	       		android:text="@string/blank"
 	      	  />
 	    
-	    	<TextView android:id="@+id/widget_temp_lo"
+	    	<TextView android:id="@+id/widget_wind"
 	        	android:layout_width="wrap_content"
 	        	android:layout_height="wrap_content"
 	        	android:text="@string/blank"
 	       	 />
 	    </LinearLayout>
+	    
+	    <TextView android:id="@+id/widget_current_zip"
+	        android:layout_width="0dp"
+	        android:layout_weight="0.5"
+	        android:layout_height="wrap_content"
+	        android:text="@string/blank"
+	        android:visibility="gone"
+	        />
 	    
 </LinearLayout>
 

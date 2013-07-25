@@ -24,7 +24,7 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f090033;
+        public static final int action_settings=0x7f090034;
         public static final int cell_day1=0x7f09001f;
         public static final int cell_day2=0x7f090020;
         public static final int cell_day3=0x7f090021;
@@ -71,8 +71,9 @@ public final class R {
         public static final int weatherheader=0x7f090015;
         public static final int webbtn=0x7f090011;
         public static final int widget_current_temp=0x7f090030;
-        public static final int widget_temp_hi=0x7f090031;
-        public static final int widget_temp_lo=0x7f090032;
+        public static final int widget_current_zip=0x7f090033;
+        public static final int widget_humidity=0x7f090031;
+        public static final int widget_wind=0x7f090032;
         public static final int wind=0x7f090027;
         public static final int zip_accept=0x7f09002f;
         public static final int zip_data=0x7f09002e;
